@@ -1,0 +1,29 @@
+# csv files#
+###################
+*.csv
+
+# matlab autosave files#
+########################
+*.asv
+
+# matlab matrix files#
+########################
+*.mat
+
+# movie files#
+########################
+*.avi
+
+# jpegs#
+########################
+*.avi
+
+#data files#
+############
+*.dat
+
+#results folder#
+################
+/results/*
+
+
