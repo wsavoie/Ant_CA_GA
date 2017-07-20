@@ -12,7 +12,7 @@
 % [x,fval] = ga(ObjectiveFunction,nvars,[],[],[],[],LB,UB, ...
 %     ConstraintFunction,options)\
 tic
-outputFolder='A:\paperv2ants\meredithCode\results';
+outputFolder='D:\Projects\Ant_CA_GA';
 
 ObjectiveFunction = @GA_REALCA_FunctionsWill;
 
@@ -27,9 +27,9 @@ nvars = 30;
 totgens = 50;
 popsize = 200;
 
-prob2turn = .35;
+prob2turn = .45;
 rechargeSteps = 600;
-
+tuntip=3;
 LB = zeros(1,nvars);
 UB = ones(1,nvars);
 
@@ -43,7 +43,7 @@ options = optimoptions(@ga,'MutationFcn', {@mutationadaptfeasible});
 
 %%%%%%%%%%%%%%%%%%%%normal%%%%%%%%%%%%%%%%%%%%
 options = optimoptions(options,'PlotFcn',{{@outputFunc,bestofgen},...
-    {@gaplotlorenzcurve,bestofgen,numIts,rechargeSteps,prob2turn}}, ...
+    {@gaplotlorenzcurve,bestofgen,numIts,rechargeSteps,prob2turn,tuntip}}, ...
     'Display','iter','MaxGenerations',totgens,'CrossoverFraction',crossOverFrac);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -74,7 +74,7 @@ saveProfile(myCluster);
 options = optimoptions(options,'UseParallel', true);
 
 %%%NORMAL%%%
-[x,fval,exitflag,output,population,scores]=ga({ObjectiveFunction,numIts,rechargeSteps,prob2turn},nvars,[],[],[],[],LB,UB,[],options);
+[x,fval,exitflag,output,population,scores]=ga({ObjectiveFunction,numIts,rechargeSteps,prob2turn,tuntip},nvars,[],[],[],[],LB,UB,[],options);
 %%%%RECH AND PTT%%%
 % [x,fval,exitflag,output,population,scores]=ga({ObjectiveFunction,numIts},nvars,[],[],[],[],LB,UB,[],options);
 toc

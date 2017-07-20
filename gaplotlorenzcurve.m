@@ -1,4 +1,4 @@
-function [ state ] = gaplotlorenzcurve( options,state,flag,bestofgen,numIts,rec,ptt )%NORMAL
+function [ state ] = gaplotlorenzcurve( options,state,flag,bestofgen,numIts,rec,ptt,tuntip )%NORMAL
 %gaplotlorenzcurve plotting function for GA connected to darias CA model
 % function [ state ] = gaplotlorenzcurve( options,state,flag,bestofgen,numIts)%%WITH rech and ptt
 
@@ -16,19 +16,19 @@ prob = a{state.Generation+1}(1:30); %30 for 30 ants
 % ptt = a{state.Generation+1}(32);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-r=CA_FunctionsWill(prob,length(prob),ni,2,0,1,rec,ptt);
+r=CA_FunctionsWill(prob,length(prob),ni,2,0,1,rec,ptt,tuntip);
 f=sum(r.markMatr(:,2:end));
 [ginM,gxy]=Gini(f);
 plot(gxy(:,1),gxy(:,2),'.-','linewidth',2,'markersize',10);
 hold on;
-load('A:\GA\CA model v2\antfigData10.mat');
+load('antfigData10.mat');
 set(gcf,'renderer','openGL');
 
 cc=parula(13);
 ccl=cc(2,:);
 plot(antfigx,antfigy,'-','color',ccl,'linewidth',2,'markersize',20);
 patch(antfigxP,antfigyP,ccl,'facealpha',.15,'edgecolor','none');
-load('A:\GA\CA model v2\antfigData1.mat');
+load('antfigData1.mat');
 plot(antfigx,antfigy,'r-','linewidth',2);
 patch(antfigxP,antfigyP,'r','facealpha',.15,'edgecolor','none')
 axis([0 1 0 1]);

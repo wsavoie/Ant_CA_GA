@@ -7,7 +7,7 @@ parfor i=1:length(bestofgen)
     
     % res(i) =CA_FunctionsWill(y,length(y),numIts,2,0);  %probs,numants,numits*10000,width,infEnergy
     % f=sum(res(i).markMatr(:,2:end));
-    res =CA_FunctionsWill(y,length(y),numIts,2,0,1,rechargeSteps,prob2turn);  %probs,numants,numits*10000,width,infEnergy
+    res =CA_FunctionsWill(y,length(y),numIts,2,0,1,rechargeSteps,prob2turn,tuntip);  %probs,numants,numits*10000,width,infEnergy
     
     
     f=sum(res.markMatr(:,2:end));

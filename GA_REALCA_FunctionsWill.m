@@ -1,5 +1,5 @@
 % function [ResEnergy]=CA_Functions(prob,numantsALL)
-function [excavated]=GA_REALCA_FunctionsWill(proba,tt,rech,ptt)%%NORMAL
+function [excavated]=GA_REALCA_FunctionsWill(proba,tt,rech,ptt,tuntip)%%NORMAL
 % function [excavated]=GA_REALCA_FunctionsWill(proba,tt %%RECH AND PTT
 % tic
 rng('shuffle');
@@ -41,7 +41,7 @@ Transp_ECost=4;%SHOULD BE 4!!!
 walk_ECost=1;
 
 tunnelsize = tw;
-tunneltip=20;
+tunneltip=tuntip;
 roadlength = 100;
 countSpot = roadlength-2;
 iterations = tt*100; % .5 secs per iteration 345600 = 48 hours

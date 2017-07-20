@@ -14,7 +14,8 @@ tw=2;
 runIts = 1;
 energyMult=1;
 rech = 600; %default recharge steps
-ptt=.7; %default probability to turn
+ptt=.7; %default probability to turnp
+tuntip=3;
 if(nargin>1)
     proba = varargin{1};
     numantsALL=varargin{2};
@@ -33,6 +34,9 @@ if(nargin>1)
     if(nargin>=8)
         ptt=varargin{8}; %1 if {5}=0, 10001 else
     end
+    if(nargin>=9)
+        tuntip=varargin{9}; %1 if {5}=0, 10001 else
+    end
 end
 
 
@@ -43,7 +47,7 @@ for z=1:size(numantsALL,2)
     %     disp(z);
     for run=runIts
         clearvars -except numants DRAW run workfolder schRes ResEnergy groupEnergy...
-            indEnergy tunLength numantsALL z proba tt tw runIts energyMult cmap rech ptt
+            indEnergy tunLength numantsALL z proba tt tw runIts energyMult cmap rech ptt tuntip
         steps2drop=20; % # of steps to drop the pellet
         pause2dig=25; %number of steps ant spends digging - 25
         recharge_steps=rech; %orginally =20steps now 20 mins
@@ -57,7 +61,7 @@ for z=1:size(numantsALL,2)
         prob_turn=ptt; %has to be 0.34
         
         tunnelsize = tw;
-        tunneltip=20;
+        tunneltip=tuntip;
         roadlength = 100;
         countSpot = roadlength-2;
         iterations = tt*100; % .5 secs per iteration 345600 = 48 hours
