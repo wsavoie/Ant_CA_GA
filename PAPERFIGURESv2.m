@@ -1,7 +1,8 @@
 %% OPTIMAL LORENZ(*PAPER QUALITY SET TUNNELLEN TO 3*)
 figure(63);hold on;
 
-load([pwd,'\R=600P=0.45\GAdat.mat']);
+% load([pwd,'\R=600P=0.45\GAdat.mat']);
+load(fullfile(pwd,'results','v1.mat'));
 y=bestofgen{end};
 co =[184 77 157]./255;
 textz = 'mode 3';
@@ -37,11 +38,12 @@ figure(55); hold on;
 fz= 20;
 cc=get(gca,'colororder');
 xlab=xlabel('Generation');ylab=ylabel('Gini Coefficient');
+gens=0:50;
 
 %equal seed
 load([pwd,'\PAPERFIG_GA_R=600_P=0.45 data\GAdatEQ.mat']);
 % gens=0:length(bestofgenOUT)-1;
-gens=0:20;
+
 eqGini=zeros(1,length(gens));
 for i = 1:length(gens)
     [eqGini(i),~]=Gini(bestofgenOUT{i});
@@ -57,7 +59,8 @@ end
 
 
 %random seed
-load([pwd,'\PAPERFIG_GA_R=600_P=0.45 data\GAdatRAND.mat']);
+% load([pwd,'\PAPERFIG_GA_R=600_P=0.45 data\GAdatRAND.mat']);
+load(fullfile(pwd,'results','v1.mat'));
 randGini=zeros(1,length(gens));
 for i = 1:length(gens)
     [randGini(i),~]=Gini(bestofgenOUT{i});
@@ -149,7 +152,8 @@ min15=60*15/.5;
 %exp
 %%%%%%%%%%%%%%%mode 1%%%%%%%%%%%%%%%%%%%%%%
 tuntip =10;
-load([pwd,'\R=600P=0.45\GAdat.mat']);
+% load([pwd,'\R=600P=0.45\GAdat.mat']);
+load([pwd,'\results\v1.mat']);
 y=ones(1,30);
 % textz = 'mode 1';
 % co =[1 0 0];
@@ -157,7 +161,7 @@ comode1 =[1 0 0];
 % 432/2 ---> 221
 % put pell2grow 200->100!
 %
-res =CA_Functions2(y,length(y),221,2,0,1,600,.45,tuntip);  %probs,numants,numits*10000,width,infEnergy
+res =CA_Functions2(y,length(y),432/2,2,0,1,600,.4,tuntip);  %probs,numants,numits*10000,width,infEnergy
 % [ggruns(i),xy{i}]=Gini(sum(res.markMatr(:,2:end)));
 xt=res.tunLength(:,1)*.5/3600;
 pellet2grow=res.pell2grow;

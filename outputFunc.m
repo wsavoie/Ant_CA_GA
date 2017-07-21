@@ -16,6 +16,16 @@ function state = outputFunc(options,state,flag,bestofgen)
 assignin('base','gen',state.Generation+1);
 assignin('base','pop',state.Population(idx,:));
 assignin('base','totPop',state.Population);
+if(state.Generation==0)
+    tTime=toc;
+    assignin('base','tTime',tTime);
+    pts('time to finish:',char(duration(seconds(tTime),'Format','hh:mm:ss')));
+else
+    tTime=evalin('base','tTime');
+    totgens=evalin('base','totgens');
+    tL=duration(seconds((totgens-state.Generation)*tTime),'Format','hh:mm:ss');
+    pts('time to finish:',char(tL));
+end
 
 evalin('base','bestofgen{gen}=pop;');
 evalin('base','totalGenPop{gen}=totPop;');

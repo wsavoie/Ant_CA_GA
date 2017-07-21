@@ -4,7 +4,7 @@ function [excavated]=GA_REALCA_FunctionsWill(proba,tt,rech,ptt,tuntip)%%NORMAL
 % tic
 rng('shuffle');
 DRAW = 0;
-movieDir='A:\movie';
+movieDir='D:\Projects\Ant_CA_GA';
 % numantsALL=[2,3,5,8,10,12,15,18,20,25,30];
 
 tw=2;

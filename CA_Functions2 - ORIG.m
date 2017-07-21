@@ -1,12 +1,13 @@
 % function [ResEnergy]=CA_Functions(prob,numantsALL)
-function [ResEnergy]=CA_FunctionsWill(varargin)
-if nargin<6%so I can supress print out if I want
-    tic
-end
+function [ResEnergy]=CA_Functions2(varargin)
+% if nargin<6%so I can supress print out if I want
+tic
+% end
 rng('shuffle');
+movieDir='A:\movie';
 DRAW = 0;
 workfolder=pwd;
-movieDir='A:\movie';
+% schRes=1;
 % numantsALL=[2,3,5,8,10,12,15,18,20,25,30];
 numantsALL= 10;
 tt=5;
@@ -14,8 +15,8 @@ tw=2;
 runIts = 1;
 energyMult=1;
 rech = 600; %default recharge steps
-ptt=.7; %default probability to turnp
-tuntip=3;
+ptt=.7; %default probability to turn
+tuntip=20;
 if(nargin>1)
     proba = varargin{1};
     numantsALL=varargin{2};
@@ -39,19 +40,22 @@ if(nargin>1)
     end
 end
 
-
 ResEnergy(size(numantsALL,2))=struct;
 for z=1:size(numantsALL,2)
     numants=numantsALL(z);
-    cmap=[1 0 0; 0.8 0.8 0; 1 1 1; 1 0.5 0;rand(numantsALL,3)];
+    cmap=[1 0 0; 0.8 0.8 0; 1 1 1; 1 0.5 0;jet(numantsALL)];
     %     disp(z);
     for run=runIts
         clearvars -except numants DRAW run workfolder schRes ResEnergy groupEnergy...
             indEnergy tunLength numantsALL z proba tt tw runIts energyMult cmap rech ptt tuntip
+        countSize= 4;
         steps2drop=20; % # of steps to drop the pellet
-        pause2dig=25; %number of steps ant spends digging - 25
+        pause2dig=25;%%25; %number of steps ant spends digging - 25
         recharge_steps=rech; %orginally =20steps now 20 mins
         %         recharge_steps=20; % important parameter - defines how much time the colony actually is actually digging
+        
+        %  pellet2grow=100; %100/tunnelsize;% should be 100/tunnel size - number of pellets to increase the tunnel tip
+        %1/30/17
         pellet2grow=200; %100/tunnelsize;% should be 100/tunnel size - number of pellets to increase the tunnel tip
         
         
@@ -79,7 +83,7 @@ for z=1:size(numantsALL,2)
         all1=0; % if all 1 is set to 1, ants are digging continuously, if to 0 - with probabilities P
         uselessRuns=0;% runs which did not result in the pellet excavation
         % set initial conditions
-        prob_lateral = 0.52;
+        prob_lateral =.52;% 0.52;
         prob_forward = 1;
         
         
@@ -88,8 +92,10 @@ for z=1:size(numantsALL,2)
             prob_lateralp = 0.7;
             prob_forwardp = 0.4;
         else
-            prob_lateralp = 0.52; % was 0.4 with penalty NO DIFFERENCE FOR NOW
+            prob_lateralp =prob_lateral;
+            %             prob_lateralp = .1;%0.52; % was 0.4 with penalty NO DIFFERENCE FOR NOW
             prob_forwardp = 1; % was 0.7
+            
         end
         
         %%%%%%%initialize road%%%%%%%%%%%%
@@ -97,14 +103,15 @@ for z=1:size(numantsALL,2)
         road = zeros(tunnelsize, roadlength); %0-sand
         road(1:tunnelsize,roadlength-tunneltip:roadlength)=1; %1 - excavated road
         %%%%%%%%%%%%%%%%%%%%%
-
-        %%%this was set on at 7/20/17        
+        
+        
+        %%%this was set on at 7/20/17
 %         if(DRAW)
 %             
 %             imagesc(road);
 %             drawnow;
 %         end
-        
+      
         %initially ALL ants have to be set with coordinates equal to the
         %tunnel length
         
@@ -126,21 +133,22 @@ for z=1:size(numantsALL,2)
             p = proba;
             if all(p(1)==p) %if equal
                 systemState.prob = p;
-                if nargin<6%so I can supress print out if I want
-                    pts('ants = ',length(p));
-                end
+                %                 if nargin<6%so I can supress print out if I want
+                pts('ants = ',length(p));
+                %                 end
                 
             else
                 
                 systemState.prob=proba;
                 systemState.prob=systemState.prob./sum(systemState.prob);
+                
                 % % %                 p=p/sum(p);
                 % %                 systemState.prob=p.^(1.75);
                 % %                 systemState.prob=systemState.prob./sum(systemState.prob);
                 % % %                 systemState.prob = p;
-                if nargin<6
-                    pts('ants = ',length(p));
-                end
+                %                 if nargin<6
+                pts('ants = ',length(p));
+                %                 end
                 
                 %                 pts(systemState.prob);
             end
@@ -152,7 +160,7 @@ for z=1:size(numantsALL,2)
         % counter for total energy
         m=1;
         %         growth_energy = zeros(m,3);
-%         growth_energy(m,1:3)=0; %TODO find out what this does
+%         growth_energy(m,1:3)=0; %%initialize to some very large value we won't know final size
         growth_energy=zeros(iterations*numants,3);
         %%%%%%%%%%%%%%
         %added code which preallocates variables which change size on each
@@ -169,12 +177,13 @@ for z=1:size(numantsALL,2)
         tunTime = zeros(1,numants);
         flow = zeros(iterations,2);
         occupied = zeros(iterations,2);
+        density = zeros(iterations,2);
         %         groupEnergy=zeros(
-        
-        indEnergy= zeros(iterations,numants,length(runIts)); % energy of individual ants per 1 step of cycle
-        tunLength=zeros(iterations,2,length(runIts)); % tunnel growth
-%         markMatr=zeros(iterations,numants+1,length(runIts));
-%         markMatrN0=zeros(iterations,numants+1,length(runIts));
+        groupEnergy = zeros(size(growth_energy,1),3,length(runIts));
+        indEnergy = zeros(iterations,numants,length(runIts)); % energy of individual ants per 1 step of cycle
+        tunLength = zeros(iterations,2,length(runIts)); % tunnel growth
+        %         markMatr=zeros(iterations,numants+1,length(runIts));
+        %         markMatrN0=zeros(iterations,numants+1,length(runIts));
         %%%%%%%%%%%%%%
         for kk=1:iterations
             
@@ -298,22 +307,25 @@ for z=1:size(numantsALL,2)
                 %                 drawnow;
                 
                 figure(2);
+                clf;
+                set(gca,'box','on');
+                
                 newR = road+2;
                 for i = 1:numantsALL
                     id = find(systemState.globalindx==i);
-                    if(systemState.digpause(id)>1)
-                        newR(systemState.y(id),...
-                            systemState.x(id))=1;
-                    else
-                        newR(systemState.y(id),...
-                            systemState.x(id))=i+4;
-                    end
+                    %                     if(systemState.digpause(id)>1)
+                    %                         newR(systemState.y(id),...
+                    %                             systemState.x(id))=1;
+                    %                     else
+                    newR(systemState.y(id),...
+                        systemState.x(id))=i+4;
+                    %                     end
                     
                 end
                 %                 cmap = lines(numantsALL+4);
                 image(newR);
                 
-                
+                text(10,1,['t = ',num2str(kk/2/60,'%10.2g'),' min'],'fontsize',20);
                 colormap(cmap);
                 colorbar;
                 drawnow;
@@ -322,6 +334,7 @@ for z=1:size(numantsALL,2)
                 %                 pause;
                 %pause;
                 %
+                
                 saveas(gcf,fullfile(movieDir,[num2str(kk),'.png']));
                 
             end
@@ -335,6 +348,11 @@ for z=1:size(numantsALL,2)
             atFace(kk,systemState.globalindx(:))=systemState.atFace(:);
             flow(kk,:)= moved;
             occupied(kk,:)= [(abs(road(1,countSpot))==2), (abs(road(2,countSpot))==2)];
+            
+            k1=find(abs(road(1,(roadlength-tunneltip+countSize):(roadlength-1)))==2);
+            k2=find(abs(road(2,(roadlength-tunneltip+countSize):(roadlength-1)))==2);
+            
+            density(kk,:)= [length(k1),length(k2)];
             if tunneltip==1
                 break;
             end
@@ -355,8 +373,8 @@ for z=1:size(numantsALL,2)
         
         % set energy
         growth_energy=growth_energy(m,:);
-%         groupEnergy(:,:,run)=growth_energy;
-%         groupEnergy(1:size(growth_energy)-1,:,run)=growth_energy(1:size(growth_energy)-1,:); % total energy expenditure per unit of tunnel growth: 1 -tunneltip; 2 -energy expenditure; 3 - number of steps kk
+        
+%         groupEnergy(:,:,run)=growth_energy(1:size(growth_energy),:); % total energy expenditure per unit of tunnel growth: 1 -tunneltip; 2 -energy expenditure; 3 - number of steps kk
         indEnergy(:,:,run)= energy; % energy of individual ants per 1 step of cycle
         tunLength(:,:,run)=tunnel_length; % tunnel growth
         %         markMatr(:,:)=markmatr;
@@ -366,11 +384,12 @@ for z=1:size(numantsALL,2)
     end
     
     ResEnergy(z).numants=numants;
-%     ResEnergy(z).groupEnergy=groupEnergy;
-    ResEnergy(z).groupEnergy=growth_energy;
+    ResEnergy(z).groupEnergy=groupEnergy;
+        ResEnergy(z).groupEnergy=growth_energy;
     ResEnergy(z).indEnergy=indEnergy;
     ResEnergy(z).tunLength=tunLength;
     %         ResEnergy(schRes).markMatr=markMatr;   %%? next line it changes?
+    ResEnergy(z).density=density;
     ResEnergy(z).markMatr=markmatrN0;
     ResEnergy(z).pall1=all1;
     ResEnergy(z).coeffP=coeffP;
@@ -392,6 +411,7 @@ for z=1:size(numantsALL,2)
     ResEnergy(z).infEnergy = energyMult>1;
     ResEnergy(z).equalDis     = all(probs(1,1)==probs(1,:));
     %energyMult = 1 if non-inf energy!
+%     schRes=z+1;
     clearvars groupEnergy indEnergy tunLength markMatr markMatrN0
 end
 %trim last line in group Energy
@@ -399,6 +419,6 @@ end
 % if(nargin==0)
 %     lorenzcurve(ResEnergy.prob,ResEnergy.pellets);
 % end
-if nargin<6
-    toc
-end
+% if nargin<6
+toc
+% end
