@@ -14,7 +14,7 @@
 tic
 outputFolder='D:\Projects\Ant_CA_GA';
 
-ObjectiveFunction = @GA_REALCA_FunctionsWill;
+ObjectiveFunction = @GA_CA_code;
 
 
 %%%%%rech and ptt%%%%%
@@ -26,8 +26,8 @@ nvars = 30;
 %%%%%%%%%%%%%%%%%%%%%%
 totgens = 20;
 popsize = 200;
-tuntip=20;
-prob2turn = .45;
+tuntip=10;
+prob2turn = .3;
 rechargeSteps = 10;
 numIts=432;
 % energyMult=0
@@ -100,4 +100,4 @@ end
 
 % save(['A:\','PAPERFIG_RAND_R=',num2str(rechargeSteps),'P=',num2str(prob2turn),'.mat']);
 date
-save(fullfile(outputFolder,'results',['v8_',char(datetime('now','Format','yyyy-MM-dd-HH-mm')),'.mat']));
+save(fullfile(outputFolder,'results',['v9_',char(datetime('now','Format','yyyy-MM-dd-HH-mm')),'.mat']));
