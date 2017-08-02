@@ -8,7 +8,7 @@
 
 # matlab matrix files#
 ########################
-*.mat
+#*.mat
 
 # movie files#
 ########################

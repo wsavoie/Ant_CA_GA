@@ -25,7 +25,7 @@ ObjectiveFunction = @GA_CA_code;
 nvars = 100;
 %%%%%%%%%%%%%%%%%%%%%%
 totgens = 20;
-popsize = 3;
+popsize = 7*nvars;
 tuntip=10;
 prob2turn = .3;
 rechargeSteps = 10;
