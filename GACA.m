@@ -22,19 +22,19 @@ ObjectiveFunction = @GA_CA_code;
 %%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%regular%%%%%%%%
-nvars = 30;
+nvars = 100;
 %%%%%%%%%%%%%%%%%%%%%%
 totgens = 20;
-popsize = 200;
+popsize = 3;
 tuntip=10;
 prob2turn = .3;
 rechargeSteps = 10;
 numIts=432;
-% energyMult=0
+energyMult=1;
+TW=5;
 
 LB = zeros(1,nvars);
 UB = ones(1,nvars);
-
 bestofgen= cell(1,totgens);
 
 
@@ -45,7 +45,7 @@ options = optimoptions(@ga,'MutationFcn', {@mutationadaptfeasible});
 
 %%%%%%%%%%%%%%%%%%%%normal%%%%%%%%%%%%%%%%%%%%
 options = optimoptions(options,'PlotFcn',{{@outputFunc,bestofgen},...
-    {@gaplotlorenzcurve,bestofgen,numIts,rechargeSteps,prob2turn,tuntip}}, ...
+    {@gaplotlorenzcurve,bestofgen,numIts,rechargeSteps,prob2turn,tuntip,TW,energyMult}}, ...
     'Display','iter','MaxGenerations',totgens,'CrossoverFraction',crossOverFrac);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -72,11 +72,11 @@ options = optimoptions(options,'PopulationSize', popsize);
 
 myCluster=parcluster('local');
 myCluster.NumWorkers=7;
-saveProfile(myCluster); 
+saveProfile(myCluster);
 options = optimoptions(options,'UseParallel', true);
-
+% proba,tt,rech,ptt,tuntip,tw,energyMult
 %%%NORMAL%%%
-[x,fval,exitflag,output,population,scores]=ga({ObjectiveFunction,numIts,rechargeSteps,prob2turn,tuntip},nvars,[],[],[],[],LB,UB,[],options);
+[x,fval,exitflag,output,population,scores]=ga({ObjectiveFunction,numIts,rechargeSteps,prob2turn,tuntip,TW,energyMult},nvars,[],[],[],[],LB,UB,[],options);
 %%%%RECH AND PTT%%%
 % [x,fval,exitflag,output,population,scores]=ga({ObjectiveFunction,numIts},nvars,[],[],[],[],LB,UB,[],options);
 toc
@@ -88,16 +88,15 @@ bestofgenOUT=cell(1,length(bestofgen));
 clear res;
 parfor i=1:length(bestofgen)
     y=bestofgen{i};
-
-% res(i) =CA_FunctionsWill(y,length(y),numIts,2,0);  %probs,numants,numits*10000,width,infEnergy
-% f=sum(res(i).markMatr(:,2:end));
-res =CA_FunctionsWill(y,length(y),numIts,2,0,1,rechargeSteps,prob2turn);  %probs,numants,numits*10000,width,infEnergy
-
-
-f=sum(res.markMatr(:,2:end));
-bestofgenOUT{i}=f;
+    
+    % res(i) =CA_FunctionsWill(y,length(y),numIts,2,0);  %probs,numants,numits*10000,width,infEnergy
+    % f=sum(res(i).markMatr(:,2:end));
+    % res =CA_FunctionsWill(y,length(y),numIts,tw,emult,1,rechargeSteps,prob2turn);  %probs,numants,numits*10000,width,infEnergy
+    res=CA_FunctionsWill(y,length(y),numIts,TW,energyMult,1,rechargeSteps,prob2turn,tuntip);
+    f=sum(res.markMatr(:,2:end));
+    bestofgenOUT{i}=f;
 end
 
 % save(['A:\','PAPERFIG_RAND_R=',num2str(rechargeSteps),'P=',num2str(prob2turn),'.mat']);
-date
-save(fullfile(outputFolder,'results',['v9_',char(datetime('now','Format','yyyy-MM-dd-HH-mm')),'.mat']));
+% date
+save(fullfile(outputFolder,'results',['50ants_',char(datetime('now','Format','yyyy-MM-dd-HH-mm')),'.mat']));

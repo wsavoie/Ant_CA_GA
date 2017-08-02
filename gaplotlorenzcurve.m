@@ -1,4 +1,4 @@
-function [ state ] = gaplotlorenzcurve( options,state,flag,bestofgen,numIts,rec,ptt,tuntip )%NORMAL
+function [ state ] = gaplotlorenzcurve( options,state,flag,bestofgen,numIts,rec,ptt,tuntip,tw,emult )%NORMAL
 %gaplotlorenzcurve plotting function for GA connected to darias CA model
 % function [ state ] = gaplotlorenzcurve( options,state,flag,bestofgen,numIts)%%WITH rech and ptt
 
@@ -7,16 +7,17 @@ function [ state ] = gaplotlorenzcurve( options,state,flag,bestofgen,numIts,rec,
 
 a=evalin('base','bestofgen');
 ni=evalin('base','numIts');
+na=evalin('base','nvars');
 % prob = a{state.Generation+1};
 
-prob = a{state.Generation+1}(1:30); %30 for 30 ants
+prob = a{state.Generation+1}(1:na); %30 for 30 ants
 
 %%%%%%%%%%rec and ptt%%%%%%%%%%%
 % rec = a{state.Generation+1}(31);
 % ptt = a{state.Generation+1}(32);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-r=CA_FunctionsWill(prob,length(prob),ni,2,0,1,rec,ptt,tuntip);
+r=CA_FunctionsWill(prob,length(prob),ni,tw,emult,1,rec,ptt,tuntip);
 f=sum(r.markMatr(:,2:end));
 [ginM,gxy]=Gini(f);
 plot(gxy(:,1),gxy(:,2),'.-','linewidth',2,'markersize',10);

@@ -29,13 +29,13 @@ if(nargin>1)
         energyMult=varargin{5}*10000+1; %1 if {5}=0, 10001 else
     end
     if(nargin>=7)
-        rech=varargin{7}; %1 if {5}=0, 10001 else
+        rech=varargin{7};
     end
     if(nargin>=8)
-        ptt=varargin{8}; %1 if {5}=0, 10001 else
+        ptt=varargin{8};
     end
     if(nargin>=9)
-        tuntip=varargin{9}; %1 if {5}=0, 10001 else
+        tuntip=varargin{9};
     end
 end
 
@@ -167,8 +167,8 @@ for z=1:size(numantsALL,2)
         atFace = zeros(iterations,numants);
         prevResting = systemState.restflag;
         tunTime = zeros(1,numants);
-        flow = zeros(iterations,2);
-        occupied = zeros(iterations,2);
+        flow = zeros(iterations,tw);
+        occupied = zeros(iterations,tw);
         %         groupEnergy=zeros(
         
         indEnergy= zeros(iterations,numants,length(runIts)); % energy of individual ants per 1 step of cycle
@@ -196,7 +196,7 @@ for z=1:size(numantsALL,2)
             tunTime(:)=tunTime(ind);
             markmatr(kk,1)=kk;% contains all ants, which present at 3 BL away from the tunnel face
             markmatrN0(kk,1)=kk; % contains all ants, which DIG(!) at 3 BL away from the tunnel face
-            moved = zeros(1,2);
+            moved = zeros(1,tw);
             
             %              %%%%%%%%%%%%
             %              vdir= road(sub2ind(size(road),y,x))./abs(road(sub2ind(size(road),y,x)));
@@ -334,7 +334,7 @@ for z=1:size(numantsALL,2)
             probs(kk,systemState.globalindx(:))=systemState.prob(:);
             atFace(kk,systemState.globalindx(:))=systemState.atFace(:);
             flow(kk,:)= moved;
-            occupied(kk,:)= [(abs(road(1,countSpot))==2), (abs(road(2,countSpot))==2)];
+            occupied(kk,:)= [(abs(road(:,countSpot))==2)];
             if tunneltip==1
                 break;
             end

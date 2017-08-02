@@ -1,5 +1,5 @@
 % function [ResEnergy]=CA_Functions(prob,numantsALL)
-function [excavated]=GA_REALCA_FunctionsWill(proba,tt,rech,ptt,tuntip)%%NORMAL
+function [excavated]=GA_CA_code(proba,tt,rech,ptt,tuntip,tw,energyMult)%%NORMAL
 % function [excavated]=GA_REALCA_FunctionsWill(proba,tt %%RECH AND PTT
 % tic
 rng('shuffle');
@@ -7,9 +7,7 @@ DRAW = 0;
 movieDir='D:\Projects\Ant_CA_GA';
 % numantsALL=[2,3,5,8,10,12,15,18,20,25,30];
 
-tw=2;
-energyMult=1;
-
+energyMult=energyMult*10000+1;
 %%%%%RECH AND PTT%%%%%%%%
 % recharge_steps=proba(31);
 % prob_turn=proba(32);
@@ -104,7 +102,7 @@ resting=zeros(numants,1);
 
 
 %         systemState.prob=p.^(1.75);
-systemState.prob=proba(1:30);
+systemState.prob=proba(1:numants);
 systemState.prob=systemState.prob./sum(systemState.prob);
 
 % counter for total energy
@@ -125,8 +123,8 @@ probs = zeros(iterations,numants);
 atFace = zeros(iterations,numants);
 prevResting = systemState.restflag;
 tunTime = zeros(1,numants);
-flow = zeros(iterations,2);
-occupied = zeros(iterations,2);
+flow = zeros(iterations,tw);
+occupied = zeros(iterations,tw);
 %         groupEnergy=zeros(
 %%%%%%%%%%%%%%
 
@@ -150,7 +148,7 @@ for kk=1:iterations
     tunTime(:)=tunTime(ind);
     markmatr(kk,1)=kk;% contains all ants, which present at 3 BL away from the tunnel face
     markmatrN0(kk,1)=kk; % contains all ants, which DIG(!) at 3 BL away from the tunnel face
-    moved = zeros(1,2);
+    moved = zeros(1,tw);
     
     %              %%%%%%%%%%%%
     %              vdir= road(sub2ind(size(road),y,x))./abs(road(sub2ind(size(road),y,x)));
@@ -273,7 +271,7 @@ for kk=1:iterations
     probs(kk,systemState.globalindx(:))=systemState.prob(:);
     atFace(kk,systemState.globalindx(:))=systemState.atFace(:);
     flow(kk,:)= moved;
-    occupied(kk,:)= [(abs(road(1,countSpot))==2), (abs(road(2,countSpot))==2)];
+    occupied(kk,:)= [(abs(road(:,countSpot))==2)];
     if tunneltip==1
         break;
     end
@@ -308,8 +306,8 @@ excavated=-sum(sum(markmatr(:,2:end)))/1000;
 % ResEnergy.prob=probs;
 % ResEnergy.atFace= atFace;
 % ResEnergy.resting=resting;
-% ResEnergy.flow = flow;
-% ResEnergy.occupied = occupied;
+ResEnergy.flow = flow;
+ResEnergy.occupied = occupied;
 % ResEnergy.pell2grow = pellet2grow;
 % ResEnergy.infEnergy = energyMult>1;
 % ResEnergy.equalDis     = all(probs(1,1)==probs(1,:));
