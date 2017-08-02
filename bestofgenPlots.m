@@ -2,12 +2,23 @@ bestofgen = bestofgen(~cellfun(@isempty,bestofgen));
 bestofgenOUT=cell(1,length(bestofgen));
 % y=bestofgen{end};
 clear res;
+
+nvars = 100;
+%%%%%%%%%%%%%%%%%%%%%%
+totgens = 20;
+popsize = 3;
+tuntip=10;
+prob2turn = .3;
+rechargeSteps = 10;
+numIts=432;
+energyMult=1;
+TW=5;
 parfor i=1:length(bestofgen)
     y=bestofgen{i};
     
     % res(i) =CA_FunctionsWill(y,length(y),numIts,2,0);  %probs,numants,numits*10000,width,infEnergy
     % f=sum(res(i).markMatr(:,2:end));
-    res =CA_FunctionsWill(y,length(y),numIts,2,0,1,rechargeSteps,prob2turn,tuntip);  %probs,numants,numits*10000,width,infEnergy
+    res =CA_FunctionsWill(y,length(y),numIts,TW,energyMult,1,rechargeSteps,prob2turn,tuntip);  %probs,numants,numits*10000,width,infEnergy
     
     
     f=sum(res.markMatr(:,2:end));
