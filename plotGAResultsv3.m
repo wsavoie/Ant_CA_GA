@@ -17,7 +17,7 @@ clear all
 %* 7. next plot
 %*15. template
 %************************************************************
-showFigs=[2];
+showFigs=[7];
 fold=uigetdir('D:\Projects\Ant_CA_GA\results');
 filez=dir(fullfile(fold,'*.mat'));
 NF=length(filez);
@@ -86,8 +86,17 @@ plot(ants,ginis,'o-','linewidth',2)
 
 % set(gca,'box','on','linewidth',2,'xtick',[0, 5,10, 15, 20], 'xticklabel',{'0','','10','','20'},'fontsize',fz);
 
-annotation('textarrow',[.225,.225],[.3,.8]);
-text(.025,.9,'unequal','fontsize',fz,'units','normalized');
+draw30line=1;
+if(draw30line)
+    yval30=ginis(ants==30);
+    plot([30,30],[0,yval30],'color','r','linewidth',2)
+    plot([0,30],[yval30,yval30],'color','r','linewidth',2)
+    set(gca,'box','on','linewidth',2,'xtick',[0, 25,30,50, 75, 100], 'xticklabel',{'0','','30','50','','100'});
+    set(gca,'ytick',[0.2,0.4,0.6,yval30,0.8, 1.0], 'yticklabel',{'0.2','0.4','0.6',num2str(yval30,2),'0.8','1'});
+end
+% annotation('textarrow',[.225,.225],[.3,.8]);
+text(.75,.95,'unequal','fontsize',fz,'units','normalized');
+text(.75,.05,'equal','fontsize',fz,'units','normalized');
 xlabel('number of ants');
 ylabel('Gini coefficient');
 figText(gcf,fz,2);
@@ -99,7 +108,7 @@ figure(xx)
 hold on;
 mark = 's';
 lw=2;
-fz= 16;
+fz= 20;
 [qm,rhom,ants]=deal(zeros(1,NF));
 cc=jet(NF);
 colormap(cc);
@@ -146,14 +155,21 @@ end
     
     haxis = gca;    
     caxis([1 NF])
-
+    aa=num2cell(ants);
+    aa2=cellfun(@(x) num2str(x),aa,'uniformoutput',0);
+         
+    
     cbarHandle = colorbar('YTick',...
         1+0.5*(NF-1)/NF:(NF-1)/NF:NF,...
-        'YTickLabel',ants, 'YLim', [1 NF]); %[]=ants
-    % set(gca,'XTick',[0.25 0.5],'YTick',[0 .1 .2],'XLim',[0.045 0.55],'YLim',[0,0.2]);
+        'YTickLabel',{'5','','','20','','','','40','','','','60','','','','80','','','','100'}, 'YLim', [1 NF]); %[]=ants
+    set(gca,'XTick',[0, 0.15 0.3]*1e-1,'YTick',[.25 .5 0.75]*1e-1);
 %     set(gca,'XTick',[0.15 0.3],'YTick',[0.025 .05],'yTicklabel',[], 'xTicklabel',[],'fontsize',fsize);
 %     set(cbarHandle,'fontsize',18');
-    axis([0 .4 0 .2])
+    ylabel(cbarHandle,'N')    
+    axis([0 .4e-1 0, 8e-2])
+    ax=gca;
+    ax.YAxis.Exponent = -2;
+    ax.XAxis.Exponent = -2;
     if(res.infEnergy)
         En=' E=\infty';
     else
@@ -162,8 +178,8 @@ end
 
 %     set(gca,'box','on','linewidth',2);
 %     set(gcf,'position',[100,100,426,429]);
-    xlab=xlabel('\rho');
-    ylab=ylabel('q');
+    xlab=xlabel('\rho(ants/BL) ');
+    ylab=ylabel('q (ants/(BL\cdotmin)');
     figText(gcf,fz,2);
 end
 %% 4 (gen(10)-gen(1)) vs. number of ants
@@ -231,19 +247,27 @@ ylabel('V (cm/ant)');
 xlabel('N (ants)');
 figText(gcf,fz,2);
 end
-%% 7 next plot
+%% 7 get cluster dissolution
 xx=7;
 if(showFigs(showFigs==xx))
 figure(xx)
 hold on;
 fz= 20;
 [V,ants]=deal(zeros(1,NF));
+h=waitbar(1/NF,[num2str(1),'/',num2str(NF)]);
 for i=1:NF
+    tic
+    if(i~=1)
+        timeLeft=ttc*(NF-i);
+        waitbar(i/NF,h,[num2str(i),'/',num2str(NF),' ',num2str(timeLeft,'%.0f'),'s left']);
+    end
     load(fullfile(fold,filez(i).name));
     res=CA_FunctionsWill(bestofgen{end},length(bestofgen{end}),numIts,TW,...
     energyMult,1,rechargeSteps,prob2turn,tuntip);
     ants(i)=nvars;
+    ttc=toc; %time to complete
 end
+closeWaitbar;
 %sort runs
 [ants,inds]=sort(ants);
 V=V(inds);
@@ -260,12 +284,20 @@ figure(xx)
 hold on;
 fz= 20;
 [V,ants]=deal(zeros(1,NF));
+h=waitbar(1/NF,[num2str(1),'/',num2str(NF)]);
 for i=1:NF
+ tic
+    if(i~=1)
+        timeLeft=ttc*(NF-i);
+        waitbar(i/NF,h,[num2str(i),'/',num2str(NF),' ',num2str(timeLeft,'%.0f'),'s left']);
+    end
     load(fullfile(fold,filez(i).name));
     res=CA_FunctionsWill(bestofgen{end},length(bestofgen{end}),numIts,TW,...
     energyMult,1,rechargeSteps,prob2turn,tuntip);
     ants(i)=nvars;
+    ttc=toc; %time to complete
 end
+closeWaitbar;
 %sort runs
 [ants,inds]=sort(ants);
 V=V(inds);
