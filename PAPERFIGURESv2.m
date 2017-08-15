@@ -84,6 +84,7 @@ set(ylab,'units','normalized','Position',[0 .5 0]);
 axis square
 % set(xlab,'margin',3,'clipping','on','position',get(xlab,'position')+[25 .01  0]);
 
+
 %% GINI cum fraction]
 fz=20;
 figure(123)
@@ -653,6 +654,94 @@ for eq = [0 1]
     set(gca,'box','on','linewidth',2);
     set(gcf,'position',[100,100,426,429]);
 end
+%% plot q_bar vs rho_bar large tunnel width
+figure(14); hold on;
+titl='Traffic (CA)';
+% p='0.35'
+% h1=xlabel('$\bar{\rho}$ (ants/site)');
+% h2=ylabel('$\bar{q}$ (ants/min)');
+fsize=24;
+% h1=xlabel('$\bar{\rho}$ (ants/BL)');
+% h2=ylabel('$\bar{q}$ ($\frac{ants}{BL{\cdot}min}$)');
+% h2=ylabel('$\bar{q}$ (ants/(BL$\cdot$min))','fontsize',fsize);
+
+% set(h1,'interpreter','Latex','FontWeight','bold');
+% set(h2,'interpreter','Latex','FontWeight','bold','fontsize',fsize);
+% eq=0; %% zero for inequal work
+for eq = [0 1]
+    
+    if(eq)
+        %     fold ='\eqResSavesInfEnergy\';
+        %     fold ='\eqResSavesInfEnergyPell600\';
+        fold = ['D:\Projects\Ant_CA_GA\results\largerTunnWidth\100antstunWidth=5.mat'];
+        mark = 's';
+        lw=2;
+    else
+        %     fold ='\uneqResSavesInfEnergy\';
+        %     fold ='\uneqResSavesInfEnergyPell600\';
+        fold =['D:\Projects\Ant_CA_GA\results\largerTunnWidth\150antstunWidth=5.mat'];
+        mark = 'o';
+        lw = 1.9;
+    end
+        stopTime =2.75;
+    startTime=.25;
+    minz = 60*(stopTime-startTime); %%%uncomment
+    %   minz = 60*(stopTime-startTime);
+    stopTime = stopTime*7200;
+    startTime=startTime*7200;
+    load(fold);
+        res=CA_FunctionsWill(bestofgen{i},length(bestofgen{i}),numIts,TW,...
+        energyMult,1,rechargeSteps,prob2turn,tuntip);
+    singleLane = sum(res.occupied(startTime+1:stopTime,:),2)./TW; %/2 for 2 lanes
+        singleFlow = sum(res.flow(startTime+1:stopTime,:),2)./TW;
+        tunLen=(res.tunLength(startTime+1:stopTime,2));
+        ts=120*minz; %timesteps to average over 120ts/min *60min/hour
+        %     ss=size(res.occupied(1:stopTime,1));
+        
+        %         newq = reshape(singleFlow(1:end),ts,size(singleFlow(1:end),1)/ts);
+        %         tunLen=reshape(tunLen(1:end),ts,size(tunLen(1:end),1)/ts);
+        %         newrho=reshape(singleLane(1:end),ts,size(singleLane(1:end),1)/ts);
+        
+        
+        a=sum(floor(sum(res.markMatr(startTime:stopTime,2:end))/res.pause2dig));
+        newq=a/ts;
+        tunLen=reshape(tunLen(1:end),ts,size(tunLen(1:end),1)/ts);
+        newrho=reshape(singleLane(1:end),ts,size(singleLane(1:end),1)/ts)./tunLen;
+        
+        
+        
+        qm = mean(newq);
+        tunLen=mean(tunLen);
+        rhom = mean(newrho);
+        
+    plot(rhom,qm,mark,'MarkerSize',15,'MarkerEdgeColor','k','LineWidth',lw);
+    
+    haxis = gca;
+    set(gca,'fontsize',55);
+    figText(gcf,16)
+%     colormap(cmap);
+    
+%     caxis([1 numcolors])
+    
+%     cbarHandle = colorbar('YTick',...
+%         1+0.5*(numcolors-1)/numcolors:(numcolors-1)/numcolors:numcolors,...
+%         'YTickLabel',ants, 'YLim', [1 numcolors]); %[]=ants
+    
+    % set(gca,'XTick',[0.25 0.5],'YTick',[0 .1 .2],'XLim',[0.045 0.55],'YLim',[0,0.2]);
+    set(gca,'XTick',[0.15 0.3],'YTick',[0.025 .05],'yTicklabel',[], 'xTicklabel',[],'fontsize',fsize);
+%     set(cbarHandle,'fontsize',18');
+    axis([0 .4 0 .075])
+    if(r.infEnergy)
+        En=' E=\infty';
+    else
+        En=[];
+    end
+
+    set(gca,'box','on','linewidth',2);
+    set(gcf,'position',[100,100,426,429]);
+end
+
+
 
 %% ANT DATA WITH THEORY LINE
 figure(6);hold on;
@@ -892,3 +981,106 @@ for modez=3
     
     clear all
 end
+
+
+%% PAPER QUALITY GINI VS. GENERATIONS for larger system
+figure(55); hold on;
+fz= 20;
+cc=get(gca,'colororder');
+xlab=xlabel('Generation');ylab=ylabel('Gini Coefficient');
+
+%equal seed
+gens20=0:20;
+load(['D:\Projects\Ant_CA_GA\results\largerTunnWidth\100antstunWidth=5.mat']);
+% gens=0:length(bestofgenOUT)-1;
+
+gini100=zeros(1,length(gens20));
+for i = 1:length(gens20)
+    [gini100(i),~]=Gini(bestofgenOUT{i});
+end
+
+
+%unequal seed
+gens10=0:10;
+load('D:\Projects\Ant_CA_GA\results\largerTunnWidth\150antstunWidth=5.mat');
+gini150=zeros(1,length(gens10));
+for i = 1:length(gens10)
+    [gini150(i),~]=Gini(bestofgenOUT{i});
+end
+
+
+
+
+plot(gens20,gini100     ,'-','linewidth',3,'color',cc(1,:));
+plot(gens10,gini150   ,'-','linewidth',3,'color',cc(2,:));
+% plot(gens,randGini   ,'-','linewidth',3,'color',cc(5,:));
+text(9,.2,'100 ants'  ,'color',cc(1,:),'fontsize',fz);
+text(9,.8,'150 ants','color',cc(2,:),'fontsize',fz);
+% text(9,.4,'Random' ,'color',cc(5,:),'fontsize',fz);
+axis([0 length(gens20)-1 0 1]);
+% set(gca,
+% set(gcf,'resize','off');
+set(gca,'box','on','linewidth',2,'xtick',[0, 5,10, 15, 20], 'xticklabel',{'0','','10','','20'}, 'ytick',[ 0,.25,.31, .5 .75 1],'yticklabel', {'0','','0.31','0.5','','1'},'fontsize',fz);
+set(xlab,'units','normalized','Position',[.5 -.02 0]);
+set(ylab,'units','normalized','Position',[0 .5 0]);
+% set(xlab,'position',get(xlab,'position')+[25 .2  0],'margin',1);
+axis square
+% set(xlab,'margin',3,'clipping','on','position',get(xlab,'position')+[25 .01  0]);
+
+%% larger system performance
+figure(55); hold on;
+fz= 20;
+cc=get(gca,'colororder');
+xlab=xlabel('Generation');ylab=ylabel('excavated length (cm)');
+
+%equal seed
+
+load(['D:\Projects\Ant_CA_GA\results\largerTunnWidth\100antstunWidth=5.mat']);
+
+gens20=0:20;
+gini100=zeros(1,length(gens20));
+perf100=zeros(length(gens20),1);
+parfor i = 1:length(gens20)
+    r=CA_FunctionsWill(bestofgen{i},length(bestofgen{i}),numIts,TW,...
+        energyMult,1,rechargeSteps,prob2turn,tuntip);
+    p2g=r.pell2grow;
+    pellPerCm=p2g*2*TW; %tunnwidt,another 2 for 1site=.5 cm
+    totPerf=cumsum(sum(r.markMatr(:,2:end),2)/r.pause2dig/pellPerCm);
+    perf100(i)=totPerf(end);
+end
+
+
+%unequal seed
+
+load('D:\Projects\Ant_CA_GA\results\largerTunnWidth\150antstunWidth=5.mat');
+gens10=0:10;
+gini150=zeros(1,length(gens10));
+perf150=zeros(length(gens10),1);
+parfor i = 1:length(gens10)
+    r=CA_FunctionsWill(bestofgen{i},length(bestofgen{i}),numIts,TW,...
+        energyMult,1,rechargeSteps,prob2turn,tuntip);
+    p2g=r.pell2grow;
+    pellPerCm=p2g*2*TW; %tunnwidt,another 2 for 1site=.5 cm
+    totPerf=cumsum(sum(r.markMatr(:,2:end),2)/r.pause2dig/pellPerCm);
+    perf150(i)=totPerf(end);
+end
+
+
+
+
+plot(gens20,perf100,'-','linewidth',3,'color',cc(1,:));
+plot(gens10,perf150 ,'-','linewidth',3,'color',cc(2,:));
+% plot(gens,randGini   ,'-','linewidth',3,'color',cc(5,:));
+text(9,.2,'100 ants'  ,'color',cc(1,:),'fontsize',fz);
+text(9,.8,'150 ants','color',cc(2,:),'fontsize',fz);
+% text(9,.4,'Random' ,'color',cc(5,:),'fontsize',fz);
+axis([0 length(gens20)-1 0 1]);
+% set(gca,
+% set(gcf,'resize','off');
+set(gca,'box','on','linewidth',2,'xtick',[0, 5,10, 15, 20], 'xticklabel',{'0','','10','','20'},...
+   'fontsize',fz);
+% set(xlab,'units','normalized','Position',[.5 -.02 0]);
+% set(ylab,'units','normalized','Position',[0 .5 0]);
+% set(xlab,'position',get(xlab,'position')+[25 .2  0],'margin',1);
+axis square
+% set(xlab,'margin',3,'clipping','on','position',get(xlab,'position')+[25 .01  0]);
