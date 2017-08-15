@@ -1,4 +1,4 @@
-
+for iii=(5:5:100)
 % ObjectiveFunction = @simple_fitness;
 % nvars = 4;    % Number of variables
 % LB = [0 0 0 0];   % Lower bound
@@ -24,16 +24,17 @@ ObjectiveFunction = @GA_CA_code;
 %%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%regular%%%%%%%%
-nvars = 100;
+nvars = iii;
+%25 30 35 40 45 50 55 60 65 70
 %%%%%%%%%%%%%%%%%%%%%%
-totgens = 20;
+totgens = 10;
 popsize = 7*nvars;
 tuntip=10;
 prob2turn = .3;
 rechargeSteps = 10;
 numIts=432;
 energyMult=1;
-TW=5;
+TW=2;
 
 LB = zeros(1,nvars);
 UB = ones(1,nvars);
@@ -62,13 +63,15 @@ options = optimoptions(options,'PlotFcn',{{@outputFunc,bestofgen},...
 
 %%%%%%%%EQUAL%%%%%%%%%%%%%%%
 % mypop= ones(popsize,nvars);
+% options = optimoptions(options,'InitialPopulation', mypop);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%UNEQUAL%%%%%%%
-% mypop= zeros(popsize,nvars);
-% mypop(:,nvars)=1;
+mypop= zeros(popsize,nvars);
+mypop(:,nvars)=1;
+options = optimoptions(options,'InitialPopulation', mypop);
 %%%%%%%%%%%%%%%%%%%
-% options = optimoptions(options,'InitialPopulation', mypop);
+
 
 options = optimoptions(options,'PopulationSize', popsize);
 
@@ -101,12 +104,13 @@ end
 
 % save(['A:\','PAPERFIG_RAND_R=',num2str(rechargeSteps),'P=',num2str(prob2turn),'.mat']);
 % date
-fname=['v1_',char(datetime('now','Format','yyyy-MM-dd-HH-mm'))];
+fname=['N=',num2str(nvars),'_','tw=',num2str(TW),'_',char(datetime('now','Format','yyyy-MM-dd-HH-mm'))];
+clear myCluster
 save(fullfile(outputFolder,'results',[fname,'.mat']));
 paramsFilePath=fullfile(outputFolder,'results',[fname,'.txt']);
 fileID = fopen(paramsFilePath,'w');
 if(isunix)
-    outputType='%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n';
+    outputType='%s\r\n%s\r\n%s\r\n%s\r\n%s\r\n%s\r\n%s\r\n%s\r\n%s\r\n';
 else
     outputType='%s\r\n%s\r\n%s\r\n%s\r\n%s\r\n%s\r\n%s\r\n%s\r\n%s\r\n';
 end
@@ -121,3 +125,6 @@ fprintf(fileID,outputType,...
     ['energyMult = ',num2str(energyMult),';'],...
     ['TW = ',num2str(TW),';']);
 fclose(fileID);
+close all;
+
+end
