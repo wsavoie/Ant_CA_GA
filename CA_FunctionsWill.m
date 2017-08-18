@@ -1,5 +1,5 @@
 % function [ResEnergy]=CA_Functions(prob,numantsALL)
-function [ResEnergy]=CA_FunctionsWill(varargin)
+function [ResEnergy roadOut]=CA_FunctionsWill(varargin)
 if nargin<6%so I can supress print out if I want
     tic
 end
@@ -16,6 +16,7 @@ energyMult=1;
 rech = 600; %default recharge steps
 ptt=.7; %default probability to turnp
 tuntip=3;
+saveRoad=0;
 if(nargin>1)
     proba = varargin{1};
     numantsALL=varargin{2};
@@ -39,15 +40,21 @@ if(nargin>1)
     end
 end
 
-
+iterations = tt*100; % .5 secs per iteration 345600 = 48 hours
+roadlength = 100;
 ResEnergy(size(numantsALL,2))=struct;
+if(nargout > 1)
+    roadOut=zeros(tw,roadlength,iterations);
+end
+
 for z=1:size(numantsALL,2)
     numants=numantsALL(z);
     cmap=[1 0 0; 0.8 0.8 0; 1 1 1; 1 0.5 0;rand(numantsALL,3)];
     %     disp(z);
     for run=runIts
         clearvars -except numants DRAW run workfolder schRes ResEnergy groupEnergy...
-            indEnergy tunLength numantsALL z proba tt tw runIts energyMult cmap rech ptt tuntip
+            indEnergy tunLength numantsALL z proba tt tw runIts energyMult cmap rech ptt tuntip...
+            roadOut saveRoad iterations roadlength
         steps2drop=20; % # of steps to drop the pellet
         pause2dig=25; %number of steps ant spends digging - 25
         recharge_steps=rech; %orginally =20steps now 20 mins
@@ -62,9 +69,9 @@ for z=1:size(numantsALL,2)
         
         tunnelsize = tw;
         tunneltip=tuntip;
-        roadlength = 100;
+
         countSpot = roadlength-2;
-        iterations = tt*100; % .5 secs per iteration 345600 = 48 hours
+       
         
         elow_limit=(walk_ECost*roadlength+Transp_ECost*roadlength+exc_ECost*pause2dig)/2;
         etop_limit=elow_limit*10 ;
@@ -346,7 +353,9 @@ for z=1:size(numantsALL,2)
             restInds= find(systemState.restflag-prevResting==-1); %resting=1 to walking=0 0-1=-1
             resting(restInds)=resting(restInds)+1;
             prevResting=systemState.restflag(:);
-            
+            if(nargout > 1)
+                roadOut(:,:,kk)=road;
+            end
         end
         
         %after diff==-1 means pellet deposited
