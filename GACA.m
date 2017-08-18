@@ -14,7 +14,7 @@ for iii=(5:5:100)
 tic
 outputFolder='D:\Projects\Ant_CA_GA';
 if(isunix)
-    outputFolder='/home/ws/Documents/Ant_CA_GA';
+    outputFolder='/home/ws/Documents/Ant_CA_1GA';
 end
 ObjectiveFunction = @GA_CA_code;
 
@@ -27,7 +27,7 @@ ObjectiveFunction = @GA_CA_code;
 nvars = iii;
 %25 30 35 40 45 50 55 60 65 70
 %%%%%%%%%%%%%%%%%%%%%%
-totgens = 10;
+totgens = 20;
 popsize = 7*nvars;
 tuntip=10;
 prob2turn = .3;
