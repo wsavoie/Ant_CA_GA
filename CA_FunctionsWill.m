@@ -308,7 +308,7 @@ for z=1:size(numantsALL,2)
 %                     else
                         antSign=sign(roadWithIdx(systemState.y(id),systemState.x(id)));
                         roadWithIdx(systemState.y(id),systemState.x(id))=...
-                            antSign*i+(antSign*2);
+                            antSign*i+(antSign*1);
 %                     end
                     
                 end
