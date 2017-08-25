@@ -16,18 +16,26 @@ TW=2;
 % filez=uigetfile('D:\Projects\Ant_CA_GA\results');
 filez='D:\Projects\Ant_CA_GA\results\unequal seed 5-100 tw=2 gen=20\N=30_tw=2_2017-08-17-00-03.mat';
 load(filez);
-[res,road]=CA_FunctionsWill(bestofgen{end},length(bestofgen{end}),numIts,TW,...
+[res,roadFull]=CA_FunctionsWill(bestofgen{end},length(bestofgen{end}),numIts,TW,...
     energyMult,1,rechargeSteps,prob2turn,tuntip);
-% 
+%% save out data
+dateFormat='dd-mm-yyyy_HHMM_';
+a=datestr(now,dateFormat);
+roadSmall=roadFull(:,:,1000:1100);
+fnameOut=fullfile(pwd,[a,'roadData.mat']);
+clsave(fnameOut,'roadFull','roadSmall','res');
+
+
+
+%% plot out 
+% figure(12);
 % cmap=brewermap(32*2,'RdGy');
 % colormap(cmap);
-figure(12);
-cmap=brewermap(32*2,'RdGy');
-colormap(cmap);
-sIx=1999; %start idx for plotting
-subplot(3,1,1);
-imagesc(road(:,:,sIx));
-subplot(3,1,2);
-imagesc(road(:,:,sIx+1));
-subplot(3,1,3);
-imagesc(road(:,:,sIx+2));
+% sIx=1999; %start idx for plotting
+% subplot(3,1,1);
+% imagesc(road(:,:,sIx));
+% subplot(3,1,2);
+% imagesc(road(:,:,sIx+1));
+% subplot(3,1,3);
+% imagesc(road(:,:,sIx+2));
+
