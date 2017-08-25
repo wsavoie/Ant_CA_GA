@@ -176,6 +176,7 @@ for z=1:size(numantsALL,2)
         tunTime = zeros(1,numants);
         flow = zeros(iterations,tw);
         occupied = zeros(iterations,tw);
+        density = zeros(iterations,1);
         %         groupEnergy=zeros(
         
         indEnergy= zeros(iterations,numants,length(runIts)); % energy of individual ants per 1 step of cycle
@@ -212,6 +213,7 @@ for z=1:size(numantsALL,2)
             %              %%%%%%%%%%%%
             
             for jj=1:numants
+                
                 %figure out direction of motion +1 up /-1 down
                 vdir = road(y(jj), x(jj))/abs(road(y(jj), x(jj))); %negative
                 %%%%%%%%%%%%%%%%%%%recharge%%%%%%%%%%%%%%%%
@@ -293,10 +295,27 @@ for z=1:size(numantsALL,2)
                 if(x(jj)<roadlength)
                     tunTime(jj)=tunTime(jj)+1;
                 end
+                
+                
             end % end of ant cycle
-            
-            
-            
+            if(nargout > 1)
+                roadWithIdx=road;
+                 for i = 1:numantsALL
+                    id = find(systemState.globalindx==i);
+%                     if(systemState.digpause(id)>1)
+%                         roadWithIdx(systemState.y(id),...
+%                             systemState.x(id))=1;
+%                     else
+                        antSign=sign(roadWithIdx(systemState.y(id),systemState.x(id)));
+                        roadWithIdx(systemState.y(id),systemState.x(id))=...
+                            antSign*i+(antSign*2);
+%                     end
+                    
+                end
+                
+                
+                roadOut(:,:,kk)=roadWithIdx;
+            end
             if(DRAW && mod(kk,1)==0)
                 % image displays only positive values: +2 rescales
                 %                 figure(1);
@@ -342,6 +361,7 @@ for z=1:size(numantsALL,2)
             atFace(kk,systemState.globalindx(:))=systemState.atFace(:);
             flow(kk,:)= moved;
             occupied(kk,:)= [(abs(road(:,countSpot))==2)];
+            density(kk,:)= numel(find(road(:,countSpot)==2))/(tunneltip*tw);
             if tunneltip==1
                 break;
             end
@@ -353,9 +373,6 @@ for z=1:size(numantsALL,2)
             restInds= find(systemState.restflag-prevResting==-1); %resting=1 to walking=0 0-1=-1
             resting(restInds)=resting(restInds)+1;
             prevResting=systemState.restflag(:);
-            if(nargout > 1)
-                roadOut(:,:,kk)=road;
-            end
         end
         
         %after diff==-1 means pellet deposited
@@ -400,6 +417,7 @@ for z=1:size(numantsALL,2)
     ResEnergy(z).pell2grow = pellet2grow;
     ResEnergy(z).infEnergy = energyMult>1;
     ResEnergy(z).equalDis     = all(probs(1,1)==probs(1,:));
+    ResEnergy(z).density = density;
     %energyMult = 1 if non-inf energy!
     clearvars groupEnergy indEnergy tunLength markMatr markMatrN0
 end

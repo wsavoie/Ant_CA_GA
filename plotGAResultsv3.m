@@ -14,10 +14,11 @@ clear all
 %* 3. number of ants, q vs rho
 %* 4. (gen(10)-gen(1)) vs. number of ants
 %* 5. *MAKES 5&6* Tunnel length excavated vs. time  AND per ant 
-%* 7. next plot
+%* 7. fixed workload distribution for q vs rho
+%* 8. get cluster dissolution
 %*15. template
 %************************************************************
-showFigs=[7];
+showFigs=[1];
 fold=uigetdir('D:\Projects\Ant_CA_GA\results');
 filez=dir(fullfile(fold,'*.mat'));
 NF=length(filez);
@@ -120,9 +121,15 @@ for i=1:NF
     %   minz = 60*(stopTime-startTime);
     stopTime = stopTime*7200;
     startTime=startTime*7200;
-    res=CA_FunctionsWill(bestofgen{end},length(bestofgen{end}),numIts,TW,...
+    prob=sort(bestofgenOUT{end}/sum(bestofgenOUT{end}));
+    res=CA_FunctionsWill(prob,length(prob),numIts,TW,...
         energyMult,1,rechargeSteps,prob2turn,tuntip);
     singleLane = sum(res.occupied(startTime+1:stopTime,:),2)./TW; %/2 for 2 lanes
+    
+    if isfield(res,'density')
+    dens = res.density(startTime+1:stopTime,:); %/2 for 2 lanes
+    d=0; %set zero for old way
+    end
         singleFlow = sum(res.flow(startTime+1:stopTime,:),2)./TW;
         tunLen=(res.tunLength(startTime+1:stopTime,2));
         ts=120*minz; %timesteps to average over 120ts/min *60min/hour
@@ -140,12 +147,18 @@ for i=1:NF
          
         qm(i) = mean(newq);
         tunLen=mean(tunLen);
-        rhom(i) = mean(newrho);
+        if d
+            rhom(i) = mean(dens);
+        else
+            rhom(i) = mean(newrho);
+        end
+%         
+        rhom(i) = mean(dens);
         ants(i)=nvars;
 end
 %sort runs
 [ants,inds]=sort(ants);
-qm=qm(inds);
+qm=qm(inds)*2;%timestep is .5 s
 rhom=rhom(inds);
 %plot newly sorted
 
@@ -162,13 +175,16 @@ end
     cbarHandle = colorbar('YTick',...
         1+0.5*(NF-1)/NF:(NF-1)/NF:NF,...
         'YTickLabel',{'5','','','20','','','','40','','','','60','','','','80','','','','100'}, 'YLim', [1 NF]); %[]=ants
-    set(gca,'XTick',[0, 0.15 0.3]*1e-1,'YTick',[.25 .5 0.75]*1e-1);
-%     set(gca,'XTick',[0.15 0.3],'YTick',[0.025 .05],'yTicklabel',[], 'xTicklabel',[],'fontsize',fsize);
+%     set(gca,'XTick',[0, 0.15 0.3]*1e-1,'YTick',[.25 .5 0.75]*1e-1);
+%     set(gca,'XTick',[0 0.005 0.01 0.015 0.02],'YTick',[.25 .5 0.75]*1e-1);
+        
 %     set(cbarHandle,'fontsize',18');
-    ylabel(cbarHandle,'N')    
-    axis([0 .4e-1 0, 8e-2])
+%     ylabel(cbarHandle,'N')
+    title(cbarHandle,'N') 
+%     axis([0 .4e-1 0, 8e-2])
+    axis([0 .3e-1 0, 0.2])
     ax=gca;
-    ax.YAxis.Exponent = -2;
+%     ax.YAxis.Exponent = -2;
     ax.XAxis.Exponent = -2;
     if(res.infEnergy)
         En=' E=\infty';
@@ -178,8 +194,9 @@ end
 
 %     set(gca,'box','on','linewidth',2);
 %     set(gcf,'position',[100,100,426,429]);
-    xlab=xlabel('\rho(ants/BL) ');
-    ylab=ylabel('q (ants/(BL\cdotmin)');
+    xlab=xlabel('\rho (ants/BL) ');
+%     ylab=ylabel('q (ants/(BL\cdotmin)');
+    ylab=ylabel('q (ants/s)');
     figText(gcf,fz,2);
 end
 %% 4 (gen(10)-gen(1)) vs. number of ants
@@ -247,8 +264,115 @@ ylabel('V (cm/ant)');
 xlabel('N (ants)');
 figText(gcf,fz,2);
 end
-%% 7 get cluster dissolution
+
+%% 7 fixed workload distribution for q vs rho
 xx=7;
+if(showFigs(showFigs==xx))
+figure(xx)
+hold on;
+mark = 's';
+lw=2;
+fz= 20;
+[qm,rhom,ants]=deal(zeros(1,NF));
+cc=jet(NF);
+colormap(cc);
+
+for i=1:NF %find ants =30
+    load(fullfile(fold,filez(i).name));
+    if nvars==30
+%     prob=bestofgen{end};
+    prob= sort(bestofgenOUT{end}/sum(bestofgenOUT{end}));
+    end
+end
+for i=1:NF
+    load(fullfile(fold,filez(i).name));
+    stopTime =3;
+    startTime=.25;
+    minz = 60*(stopTime-startTime); %%%uncomment
+    %   minz = 60*(stopTime-startTime);
+    stopTime = stopTime*7200;
+    startTime=startTime*7200;
+    pp=InterpolateGAProbsFromProb(nvars,prob);
+    res=CA_FunctionsWill(pp,length(pp),numIts,TW,...
+        energyMult,1,rechargeSteps,prob2turn,tuntip); %tuntip instead of 5
+    singleLane = sum(res.occupied(startTime+1:stopTime,:),2)./TW; %/2 for 2 lanes
+    
+    if isfield(res,'density')
+    dens = res.density(startTime+1:stopTime,:); %/2 for 2 lanes
+    d=0; %set zero for old way
+    end
+        singleFlow = sum(res.flow(startTime+1:stopTime,:),2)./TW;
+        tunLen=(res.tunLength(startTime+1:stopTime,2));
+        ts=120*minz; %timesteps to average over 120ts/min *60min/hour
+        %     ss=size(res.occupied(1:stopTime,1));
+        
+        %         newq = reshape(singleFlow(1:end),ts,size(singleFlow(1:end),1)/ts);
+        %         tunLen=reshape(tunLen(1:end),ts,size(tunLen(1:end),1)/ts);
+        %         newrho=reshape(singleLane(1:end),ts,size(singleLane(1:end),1)/ts);
+        
+        
+        a=sum(sum(res.markMatr(startTime:stopTime,2:end)))/res.pause2dig;
+        newq=a/ts;
+        tunLen=reshape(tunLen(1:end),ts,size(tunLen(1:end),1)/ts);
+        newrho=reshape(singleLane(1:end),ts,size(singleLane(1:end),1)/ts)./tunLen;
+         
+        qm(i) = mean(newq);
+        tunLen=mean(tunLen);
+        if d
+            rhom(i) = mean(dens);
+        else
+            rhom(i) = mean(newrho);
+        end
+%         
+        rhom(i) = mean(dens);
+        ants(i)=nvars;
+end
+%sort runs
+[ants,inds]=sort(ants);
+qm=qm(inds)*2;%timestep is .5 s
+rhom=rhom(inds);
+%plot newly sorted
+
+for(i=1:NF)
+    plot(rhom(i),qm(i),'s','markerfacecolor',cc(i,:),'MarkerSize',15,'MarkerEdgeColor','k','LineWidth',lw);
+end
+    
+    haxis = gca;    
+    caxis([1 NF])
+    aa=num2cell(ants);
+    aa2=cellfun(@(x) num2str(x),aa,'uniformoutput',0);
+         
+    
+    cbarHandle = colorbar('YTick',...
+        1+0.5*(NF-1)/NF:(NF-1)/NF:NF,...
+        'YTickLabel',{'5','','','20','','','','40','','','','60','','','','80','','','','100'}, 'YLim', [1 NF]); %[]=ants
+%     set(gca,'XTick',[0, 0.15 0.3]*1e-1,'YTick',[.25 .5 0.75]*1e-1);
+%     set(gca,'XTick',[0 0.005 0.01 0.015 0.02],'YTick',[.25 .5 0.75]*1e-1);
+        
+%     set(cbarHandle,'fontsize',18');
+%     ylabel(cbarHandle,'N')
+    title(cbarHandle,'N') 
+%     axis([0 .4e-1 0, 8e-2])
+    axis([0 .3e-1 0, 0.2])
+    ax=gca;
+%     ax.YAxis.Exponent = -2;
+    ax.XAxis.Exponent = -2;
+    if(res.infEnergy)
+        En=' E=\infty';
+    else
+        En=[];
+    end
+
+%     set(gca,'box','on','linewidth',2);
+%     set(gcf,'position',[100,100,426,429]);
+    xlab=xlabel('\rho (ants/BL) ');
+%     ylab=ylabel('q (ants/(BL\cdotmin)');
+    ylab=ylabel('q (ants/s)');
+    figText(gcf,fz,2);
+end
+
+%% 8 get cluster dissolution
+xx=8;
 if(showFigs(showFigs==xx))
 figure(xx)
 hold on;
@@ -257,36 +381,6 @@ fz= 20;
 h=waitbar(1/NF,[num2str(1),'/',num2str(NF)]);
 for i=1:NF
     tic
-    if(i~=1)
-        timeLeft=ttc*(NF-i);
-        waitbar(i/NF,h,[num2str(i),'/',num2str(NF),' ',num2str(timeLeft,'%.0f'),'s left']);
-    end
-    load(fullfile(fold,filez(i).name));
-    res=CA_FunctionsWill(bestofgen{end},length(bestofgen{end}),numIts,TW,...
-    energyMult,1,rechargeSteps,prob2turn,tuntip);
-    ants(i)=nvars;
-    ttc=toc; %time to complete
-end
-closeWaitbar;
-%sort runs
-[ants,inds]=sort(ants);
-V=V(inds);
-%plot newly sorted
-plot(ants,V,'o-','linewidth',2);
-ylabel('');
-xlabel('');
-figText(gcf,fz,2);
-end
-%% 15 TEMPLATE
-xx=15;
-if(showFigs(showFigs==xx))
-figure(xx)
-hold on;
-fz= 20;
-[V,ants]=deal(zeros(1,NF));
-h=waitbar(1/NF,[num2str(1),'/',num2str(NF)]);
-for i=1:NF
- tic
     if(i~=1)
         timeLeft=ttc*(NF-i);
         waitbar(i/NF,h,[num2str(i),'/',num2str(NF),' ',num2str(timeLeft,'%.0f'),'s left']);
