@@ -23,7 +23,7 @@ dateFormat='dd-mm-yyyy_HHMM_';
 a=datestr(now,dateFormat);
 roadSmall=roadFull(:,:,1000:1100);
 fnameOut=fullfile(pwd,[a,'roadData.mat']);
-clsave(fnameOut,'roadFull','roadSmall','res');
+save(fnameOut,'roadFull','roadSmall','res');
 
 
 
