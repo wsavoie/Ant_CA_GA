@@ -11,14 +11,15 @@ clear all
 %* Fig numbers:
 %* 1. gini vs gens
 %* 2. best of gen gini(last) vs. number of ants
-%* 3. number of ants, q vs rho
+%* 3. number of ants, q vs rho *use 7*
 %* 4. (gen(10)-gen(1)) vs. number of ants
 %* 5. *MAKES 5&6* Tunnel length excavated vs. time  AND per ant 
-%* 7. fixed workload distribution for q vs rho
+%* 7. *fixed* workload distribution for q vs rho
 %* 8. get cluster dissolution
+%* 9 excavation amount for results for different single runs
 %*15. template
 %************************************************************
-showFigs=[1];
+showFigs=[9];
 fold=uigetdir('D:\Projects\Ant_CA_GA\results');
 filez=dir(fullfile(fold,'*.mat'));
 NF=length(filez);
@@ -400,6 +401,44 @@ plot(ants,V,'o-','linewidth',2);
 ylabel('');
 xlabel('');
 figText(gcf,fz,2);
+end
+%% 9 excavation amount for results for different single runs
+xx=9;
+if(showFigs(showFigs==xx))
+figure(xx)
+hold on;
+fz= 20;
+cc=get(gca,'colororder');
+datAll=zeros(NF,4);     %type,ant#,revProb,ExcavationAmount
+for i=1:NF
+    load(fullfile(fold,filez(i).name));
+    [~,val]=parseFileNames(filez(i).name,1);  
+    xt=res.tunLength(:,1)*.5/3600;
+    pellet2grow=res.pell2grow;
+    pellPerCm = pellet2grow*2*2; %tunnwidth=2,another 2 for 1site=.5 cm
+    pellsTot = sum(sum(res.markMatr(:,2:end)))/res.pause2dig/pellPerCm;
+    datAll(i,:)=[val(1),res.numants,val(2),pellsTot];
+end
+eq=datAll(datAll(:,1)==0,:); %equal distrib= type 0, square marker
+uneq=datAll(datAll(:,1)==1,:);%unequal distrib= type 1 circle marker 
+
+% plot(eq(:,3),eq(:,4),'s-','markerfacecolor',cc(1,:),'MarkerSize',15,'MarkerEdgeColor','k','LineWidth',2);
+% plot(uneq(:,3),uneq(:,4),'o-','markerfacecolor',cc(2,:),'MarkerSize',15,'MarkerEdgeColor','k','LineWidth',2);
+
+plot(eq(:,3),eq(:,4),'s-','markerfacecolor',cc(1,:),'MarkerSize',6,'MarkerEdgeColor','k','LineWidth',1.4);
+plot(uneq(:,3),uneq(:,4),'o-','markerfacecolor',cc(2,:),'MarkerSize',6,'MarkerEdgeColor','k','LineWidth',1.4);
+
+[mRev,revInd]=max(uneq(:,4));
+pts('mRev=',mRev,' reversal=',uneq(revInd,3));
+
+plot([uneq(revInd,3),uneq(revInd,3)],[0,mRev],'r','linewidth',2);
+plot([0,uneq(revInd,3)],[mRev,mRev],'r','linewidth',2);
+
+set(gca,'xtick',[0, .15 ,0.25 ,0.5,0.75 ,1], 'xticklabel',{'0','0.15','','0.5','','1'}, 'ytick',[1 2 3 3.642 4],'yticklabel', {'1','2','3','3.64','4'},'fontsize',fz);
+ylabel('V (cm)');
+xlabel('Reversal probability');
+figText(gcf,fz,2);
+% set(gca,'yscale','log','xscale','log','xticklabelmode','auto','xtickmode','auto','yticklabelmode','auto','ytickmode','auto')
 end
 %% 55 old gini vs generations
 xx=55;
