@@ -19,7 +19,7 @@ clear all
 %* 9 excavation amount for results for different single runs
 %*15. template
 %************************************************************
-showFigs=[9];
+showFigs=[3];
 fold=uigetdir('D:\Projects\Ant_CA_GA\results');
 filez=dir(fullfile(fold,'*.mat'));
 NF=length(filez);
@@ -141,8 +141,8 @@ for i=1:NF
         %         newrho=reshape(singleLane(1:end),ts,size(singleLane(1:end),1)/ts);
         
         
-        a=sum(sum(res.markMatr(startTime:stopTime,2:end)))/res.pause2dig;
-        newq=a/ts;
+        qq=sum(sum(res.markMatr(startTime:stopTime,2:end)))/res.pause2dig;
+        newq=qq/ts;
         tunLen=reshape(tunLen(1:end),ts,size(tunLen(1:end),1)/ts);
         newrho=reshape(singleLane(1:end),ts,size(singleLane(1:end),1)/ts)./tunLen;
          
@@ -154,7 +154,7 @@ for i=1:NF
             rhom(i) = mean(newrho);
         end
 %         
-        rhom(i) = mean(dens);
+%         rhom(i) = mean(dens);
         ants(i)=nvars;
 end
 %sort runs
@@ -312,8 +312,8 @@ for i=1:NF
         %         newrho=reshape(singleLane(1:end),ts,size(singleLane(1:end),1)/ts);
         
         
-        a=sum(sum(res.markMatr(startTime:stopTime,2:end)))/res.pause2dig;
-        newq=a/ts;
+        qq=sum(sum(res.markMatr(startTime:stopTime,2:end)))/res.pause2dig;
+        newq=qq/ts;
         tunLen=reshape(tunLen(1:end),ts,size(tunLen(1:end),1)/ts);
         newrho=reshape(singleLane(1:end),ts,size(singleLane(1:end),1)/ts)./tunLen;
          
