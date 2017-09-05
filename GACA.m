@@ -1,4 +1,4 @@
-for iii=(5:5:100)
+for iii=(90:5:100)
 % ObjectiveFunction = @simple_fitness;
 % nvars = 4;    % Number of variables
 % LB = [0 0 0 0];   % Lower bound
@@ -14,7 +14,7 @@ for iii=(5:5:100)
 tic
 outputFolder='D:\Projects\Ant_CA_GA';
 if(isunix)
-    outputFolder='/home/ws/Documents/Ant_CA_1GA';
+    outputFolder='/home/ws/Documents/Ant_CA_GA';
 end
 ObjectiveFunction = @GA_CA_code;
 
@@ -27,7 +27,7 @@ ObjectiveFunction = @GA_CA_code;
 nvars = iii;
 %25 30 35 40 45 50 55 60 65 70
 %%%%%%%%%%%%%%%%%%%%%%
-totgens = 20;
+totgens = 10;
 popsize = 7*nvars;
 tuntip=10;
 prob2turn = .3;
@@ -43,8 +43,8 @@ bestofgen= cell(1,totgens);
 
 
 crossOverFrac = 0; %no crossover
-% options = optimoptions(@ga,'MutationFcn',{@mutationuniform,mutRate});
-options = optimoptions(@ga,'MutationFcn', {@mutationadaptfeasible});
+options = optimoptions(@ga,'MutationFcn',{@mutationgaussian,.2,.5});
+%options = optimoptions(@ga,'MutationFcn', {@mutationadaptfeasible});
 
 %%%%%%%%%%%%%%%%%%%%normal%%%%%%%%%%%%%%%%%%%%
 options = optimoptions(options,'PlotFcn',{{@outputFunc,bestofgen},...
