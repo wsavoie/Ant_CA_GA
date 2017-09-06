@@ -35,6 +35,7 @@ save(fnameOut,'roadFull','roadSmall','res');
 
 end
 
+while i ~= 1
 %% plot out 
 % figure(12);
 % cmap=brewermap(32*2,'RdGy');
