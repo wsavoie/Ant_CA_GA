@@ -21,7 +21,7 @@ clear all
 %*11. plot gini in vs gini out with multiple runs
 %*15. template
 %************************************************************
-showFigs=[10 11];
+showFigs=[10];
 fold=uigetdir('D:\Projects\Ant_CA_GA\results');
 filez=dir(fullfile(fold,'*.mat'));
 NF=length(filez);
@@ -69,7 +69,7 @@ if(showFigs(showFigs==xx))
     title(cbarHandle,'N (ants)')
     figText(gcf,fz);
 end
-
+fold
 %% 2 best of gen gini(last) vs. number of ants
 xx=2;
 if(showFigs(showFigs==xx))
@@ -465,11 +465,11 @@ if(showFigs(showFigs==xx))
         gDatAll(i,:)=[res.numants,pellsTot,G(i),Gout];
     end
     %Gini In
-    plot(gDatAll(:,3),gDatAll(:,2),'o-','markerfacecolor','w','linewidth',2,'markersize',7);
+    plot(gDatAll(:,3),gDatAll(:,2)/TW,'o-','markerfacecolor','w','linewidth',2,'markersize',7);
     %Gini Out
-    plot(gDatAll(:,4),gDatAll(:,2),'o-','markerfacecolor','w','linewidth',2,'markersize',7);
+%     plot(gDatAll(:,4),gDatAll(:,2),'o-','markerfacecolor','w','linewidth',2,'markersize',7);
     xlabel('Gini');
-    ylabel('V (cm)');
+    ylabel('V/TW');
     %     set(gca,'xtick',[0, .15 ,0.25 ,0.5,0.75 ,1], 'xticklabel',{'0','0.15','','0.5','','1'}, 'ytick',[1 2 3 3.642 4],'yticklabel', {'1','2','3','3.64','4'},'fontsize',fz);
     %     set(gca,'yscale','log','xscale','log','xticklabelmode','auto','xtickmode','auto','yticklabelmode','auto','ytickmode','auto')
     

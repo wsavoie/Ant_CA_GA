@@ -41,7 +41,7 @@ xlab=xlabel('Generation');ylab=ylabel('Gini Coefficient');
 gens=0:50;
 
 %equal seed
-load([pwd,'\PAPERFIG_GA_R=600_P=0.45 data\GAdatEQ.mat']);
+load(['A:\paperv2ants\PAPER FIGS and data\PAPERFIG_GA_R=600_P=0.45 data\GAdatEQ.mat']);
 % gens=0:length(bestofgenOUT)-1;
 
 eqGini=zeros(1,length(gens));
@@ -51,7 +51,7 @@ end
 
 
 %unequal seed
-load([pwd,'\PAPERFIG_GA_R=600_P=0.45 data\GAdatUNEQ.mat']);
+load(['A:\paperv2ants\PAPER FIGS and data\PAPERFIG_GA_R=600_P=0.45 data\GAdatUNEQ.mat']);
 uneqGini=zeros(1,length(gens));
 for i = 1:length(gens)
     [uneqGini(i),~]=Gini(bestofgenOUT{i});
@@ -60,7 +60,7 @@ end
 
 %random seed
 % load([pwd,'\PAPERFIG_GA_R=600_P=0.45 data\GAdatRAND.mat']);
-load(fullfile(pwd,'results','v1.mat'));
+load(['A:\paperv2ants\PAPER FIGS and data\PAPERFIG_GA_R=600_P=0.45 data\GAdatRAND.mat']);
 randGini=zeros(1,length(gens));
 for i = 1:length(gens)
     [randGini(i),~]=Gini(bestofgenOUT{i});
@@ -74,7 +74,8 @@ plot(gens,randGini   ,'-','linewidth',3,'color',cc(5,:));
 text(9,.2,'Equal'  ,'color',cc(1,:),'fontsize',fz);
 text(9,.8,'Unequal','color',cc(2,:),'fontsize',fz);
 text(9,.4,'Random' ,'color',cc(5,:),'fontsize',fz);
-axis([0 length(gens)-1 0 1]);
+% axis([0 length(gens)-1 0 1]);
+axis([0 20 0 1]);
 % set(gca,
 % set(gcf,'resize','off');
 set(gca,'box','on','linewidth',2,'xtick',[0, 10,20], 'xticklabel',{'0','','20'}, 'ytick',[ .5  1],'yticklabel', {'','1'},'fontsize',fz);
