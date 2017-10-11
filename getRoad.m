@@ -25,6 +25,7 @@ pp=sort(bestofgenOUT{end}/sum(bestofgenOUT{end}));
 end
 [res,roadFull]=CA_FunctionsWill(pp,length(pp),numIts,TW,...
     energyMult,1,rechargeSteps,prob2turn,tuntip);
+end
 %% save out data
 dateFormat='dd-mm-yyyy_HHMM_';
 a=datestr(now,dateFormat);

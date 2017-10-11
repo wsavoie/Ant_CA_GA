@@ -9,7 +9,7 @@ clear all
 
 %************************************************************
 %* Fig numbers:
-%* 1. gini vs gens
+%* 1. gini vs gens for different numbers of ants
 %* 2. best of gen gini(last) vs. number of ants
 %* 3. number of ants, q vs rho *use 7*
 %* 4. (gen(10)-gen(1)) vs. number of ants
@@ -19,14 +19,18 @@ clear all
 %* 9. excavation amount for results for different single runs
 %*10. plot excavation rate vs. Gini in
 %*11. plot gini in vs gini out with multiple runs
-%*15. template
+%*12. plot cum. work vs. cum. pop
+%*13. gini vs. gens for paper
+%*14. gini vs reversal
+%*15. ant exp lorenz with theory lorenz
+%*55. old gini vs generations
 %************************************************************
-showFigs=[10];
+showFigs=[15];
 fold=uigetdir('D:\Projects\Ant_CA_GA\results');
 filez=dir(fullfile(fold,'*.mat'));
 NF=length(filez);
 cc=jet(NF);
-%% 1 gini vs gens
+%% 1 gini vs gens for different numbers of ants
 xx=1;
 if(showFigs(showFigs==xx))
     figure(xx)
@@ -101,8 +105,8 @@ if(showFigs(showFigs==xx))
     % annotation('textarrow',[.225,.225],[.3,.8]);
     text(.75,.95,'unequal','fontsize',fz,'units','normalized');
     text(.75,.05,'equal','fontsize',fz,'units','normalized');
-    xlabel('number of ants');
-    ylabel('Gini coefficient');
+    xlabel('N (ants)');
+    ylabel('Gini');
     figText(gcf,fz,2);
 end
 %% 3 number of ants, q vs rhos
@@ -413,6 +417,9 @@ if(showFigs(showFigs==xx))
     hold on;
     fz= 20;
     cc=get(gca,'colororder');
+    
+    unitless=1;
+    
     datAll=zeros(NF,4);     %type,ant#,revProb,ExcavationAmount
     for i=1:NF
         load(fullfile(fold,filez(i).name));
@@ -428,24 +435,39 @@ if(showFigs(showFigs==xx))
     
     % plot(eq(:,3),eq(:,4),'s-','markerfacecolor',cc(1,:),'MarkerSize',15,'MarkerEdgeColor','k','LineWidth',2);
     % plot(uneq(:,3),uneq(:,4),'o-','markerfacecolor',cc(2,:),'MarkerSize',15,'MarkerEdgeColor','k','LineWidth',2);
+    if(unitless)
+        TW=size(res.occupied,2);
+        ylabel('V/TW');
+        set(gca,'xtick',[0, .15 ,0.25 ,0.5,0.75 ,1], 'xticklabel',{'0','0.15','','0.5','','1'}, 'ytick',[0.5 1.0 1.5 1.82 2],'yticklabel', {'0.5','1','1.5','1.82','2'},'fontsize',fz);
+    else
+        TW=1;
+        ylabel('V (cm)');
+        set(gca,'xtick',[0, .15 ,0.25 ,0.5,0.75 ,1], 'xticklabel',{'0','0.15','','0.5','','1'}, 'ytick',[1 2 3 3.642 4],'yticklabel', {'1','2','3','3.64','4'},'fontsize',fz);
+    end
     
-    plot(eq(:,3),eq(:,4),'s-','markerfacecolor',cc(1,:),'MarkerSize',6,'MarkerEdgeColor','k','LineWidth',1.4);
-    plot(uneq(:,3),uneq(:,4),'o-','markerfacecolor',cc(2,:),'MarkerSize',6,'MarkerEdgeColor','k','LineWidth',1.4);
+    %%%%%with markers%%%
+    %     plot(eq(:,3),eq(:,4)/TW,'s-','markerfacecolor',cc(1,:),'MarkerSize',6,'MarkerEdgeColor','k','LineWidth',1.4);
+    %     plot(uneq(:,3),uneq(:,4)/TW,'o-','markerfacecolor',cc(2,:),'MarkerSize',6,'MarkerEdgeColor','k','LineWidth',1.4);
+    
+    %%%%%without markers%%%%%%%%
+    plot(eq(:,3),eq(:,4)/TW,'-','LineWidth',3);
+    plot(uneq(:,3),uneq(:,4)/TW,'-','LineWidth',3);
     
     [mRev,revInd]=max(uneq(:,4));
     pts('mRev=',mRev,' reversal=',uneq(revInd,3));
     
-    plot([uneq(revInd,3),uneq(revInd,3)],[0,mRev],'r','linewidth',2);
-    plot([0,uneq(revInd,3)],[mRev,mRev],'r','linewidth',2);
+    plot([uneq(revInd,3),uneq(revInd,3)],[0,mRev]/TW,'r','linewidth',2);
+    plot([0,uneq(revInd,3)],[mRev,mRev]/TW,'r','linewidth',2);
     
-    set(gca,'xtick',[0, .15 ,0.25 ,0.5,0.75 ,1], 'xticklabel',{'0','0.15','','0.5','','1'}, 'ytick',[1 2 3 3.642 4],'yticklabel', {'1','2','3','3.64','4'},'fontsize',fz);
-    ylabel('V (cm)');
+    
+    
     xlabel('Reversal probability');
     figText(gcf,fz,2);
     % set(gca,'yscale','log','xscale','log','xticklabelmode','auto','xtickmode','auto','yticklabelmode','auto','ytickmode','auto')
 end
 
 %% 10 plot excavation rate vs. Gini
+%to get 3 different tunnel widths edit TW to be 2 3 4 etc
 xx=[10];
 if(showFigs(showFigs==xx))
     figure(xx(1))
@@ -467,7 +489,7 @@ if(showFigs(showFigs==xx))
     %Gini In
     plot(gDatAll(:,3),gDatAll(:,2)/TW,'o-','markerfacecolor','w','linewidth',2,'markersize',7);
     %Gini Out
-%     plot(gDatAll(:,4),gDatAll(:,2),'o-','markerfacecolor','w','linewidth',2,'markersize',7);
+    %     plot(gDatAll(:,4),gDatAll(:,2),'o-','markerfacecolor','w','linewidth',2,'markersize',7);
     xlabel('Gini');
     ylabel('V/TW');
     %     set(gca,'xtick',[0, .15 ,0.25 ,0.5,0.75 ,1], 'xticklabel',{'0','0.15','','0.5','','1'}, 'ytick',[1 2 3 3.642 4],'yticklabel', {'1','2','3','3.64','4'},'fontsize',fz);
@@ -478,7 +500,7 @@ if(showFigs(showFigs==xx))
     yl=ylim;
     ylim([yl(1)*.975,yl(2)*1.025]);
     set(gca,'xtick',[0, .2 ,.4 ,.6 ,.8 ,1]);
-
+    
 end
 
 %% 11. plot gini in vs gini out with multiple runs
@@ -493,13 +515,13 @@ if(showFigs(showFigs==xx))
     Gout=zeros(length(giniX),numIts);
     for i=1:length(giniX)
         parfor j=1:numIts
-        res=CA_FunctionsWill(giniY(i,:),length(giniY(i,:)),432,TW,...
-            1,1,10,.3,10);
-        xt=res.tunLength(:,1)*.5/3600;
-        pellet2grow=res.pell2grow;
-        pellPerCm = pellet2grow*2*2; %tunnwidth=2,another 2 for 1site=.5 cm
-        pellsTot = sum(sum(res.markMatr(:,2:end)))/res.pause2dig/pellPerCm;
-        Gout(i,j)=Gini(sum(res.markMatr(:,2:end)));
+            res=CA_FunctionsWill(giniY(i,:),length(giniY(i,:)),432,TW,...
+                1,1,10,.3,10);
+            xt=res.tunLength(:,1)*.5/3600;
+            pellet2grow=res.pell2grow;
+            pellPerCm = pellet2grow*2*2; %tunnwidth=2,another 2 for 1site=.5 cm
+            pellsTot = sum(sum(res.markMatr(:,2:end)))/res.pause2dig/pellPerCm;
+            Gout(i,j)=Gini(sum(res.markMatr(:,2:end)));
         end
         pts(i,'/',length(giniX));
     end
@@ -519,7 +541,174 @@ if(showFigs(showFigs==xx))
     set(gca,'xtick',[0, .2 ,.4 ,.6 ,.8 ,1],'ytick',[0, .2 ,.4 ,.6 ,.8 ,1]);
     axis square;
 end
+%% 12. plot cum. work vs. cum. pop
+xx=12;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    fz= 20;
+    load(fullfile(pwd,'results','v1.mat'));
+    y=bestofgen{end};
+    TW=2;
+    co =[184 77 157]./255;
+    textz = 'mode 3';
+    %uncomment if not using matrix file containing correct tunnel tip=3
+    %     res =CA_Functions2(y,length(y),432,2,1,1,600,.3,3);  %probs,numants,numits*10000,width,infEnergy
+    load(['D:\Projects\Ant_CA_GA\results\giniPlotDat\unequalSeed\N=30_tw=2_2017-10-10-14-45.mat']);
+    
+    GENNUM=10;%generation number to plot from
+    y=bestofgen{GENNUM};
+    res=CA_FunctionsWill(y,length(y),432,TW,1,1,10,.3,10);
+    z = zeros(1,29);
+    z(30)=1;
+    [~,eqLine]=Gini(ones(1,30));
+    [~,uneqLine]=Gini(z);
+    [~,theoryLine]=Gini(sum(res.markMatr(:,2:end)));
+    cc=get(gca,'colororder');
+    ucol=cc(1,:);
+    ecol=cc(2,:);
+    tcol=cc(5,:);
+    
+    plot(eqLine(:,1),eqLine(:,2),'linewidth',3,'color',ecol);
+    plot(uneqLine(:,1),uneqLine(:,2),'linewidth',3,'color',ucol);
+    plot(theoryLine(:,1),theoryLine(:,2),'linewidth',3,'color',tcol);
+    fz=20;
+    
+    text(.35,.61,'Equal','fontsize',fz,'color',ecol,'fontname','arial','fontangle','italic');
+    text(.45,.325,'Theory','fontsize',fz,'color',tcol,'fontname','arial','fontangle','italic');
+    text(.55,.0725,'Unequal','fontsize',fz,'color',ucol,'fontname','arial','fontangle','italic');
+    
+    xlabel('\it{Cum. fraction of workers}');ylabel('{\itCum. fraction of work}');
+    set(gca,'box','on','linewidth',2,'xtick',[0 .5 1], 'ytick',[.5 1],'fontsize',fz);
+    axis([0 1 0 1]);
+    axis square
+end
+%% 13 gini vs generations for paper
+xx=13;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    cc=get(gca,'colororder');
+    fz= 20;
+    gens=0:20;
+    %initialize gini vars
+    [giniEq,giniUneq,giniRand]=deal(gens);
+    
+    %equal seed
+    load(['D:\Projects\Ant_CA_GA\results\giniPlotDat\equalSeed\N=30_tw=2_2017-10-10-17-13.mat']);
+    for i = 1:length(gens)
+        [giniEq(i),~]=Gini(bestofgenOUT{i});
+    end
+    
+    %unequal seed
+    load(['D:\Projects\Ant_CA_GA\results\giniPlotDat\unequalSeed\N=30_tw=2_2017-10-10-14-45.mat']);
+    for i = 1:length(gens)
+        [giniUneq(i),~]=Gini(bestofgenOUT{i});
+    end
+    
+    
+%         rand seed
+        load(['D:\Projects\Ant_CA_GA\results\giniPlotDat\random seed tw=2 for gini .7 crossover\N=30_tw=2_2017-10-10-19-52.mat']);
+        for i = 1:length(gens)
+            [giniRand(i),~]=Gini(bestofgenOUT{i});
+        end
+    
+    plot(gens,giniEq   ,'-','linewidth',3,'color',cc(1,:));
+    plot(gens,giniUneq ,'-','linewidth',3,'color',cc(2,:));
+    % 	plot(gens,giniRand ,'-','linewidth',3,'color',cc(5,:));
+    
+    axis([0 length(gens)-1 0 1]);
+    
+    set(gca,'box','on','linewidth',2);
+    set(gca,'xtick',[0, 5,10, 15, 20], 'xticklabel',{'0','','10','','20'} ,'fontsize',fz);
+    %     'ytick',[ .25,.31, .5 .75 1],'yticklabel', {'0.31','0.5','','1'}
+    axis square
+    
+    xlab=xlabel('Generation');ylab=ylabel('Gini Coefficient');
+    figText(gcf,fz);
+end
 
+
+%% 14 gini vs reversal
+xx=14;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    fz= 20;
+    cc=get(gca,'colororder');
+    
+    unitless=1;
+    
+    datAll=zeros(NF,4);     %type,ant#,revProb,ExcavationAmount
+    for i=1:NF
+        load(fullfile(fold,filez(i).name));
+        [~,val]=parseFileNames(filez(i).name,1);
+        a=Gini(sum(res.markMatr(:,2:end)));
+        datAll(i,:)=[val(1),res.numants,val(2),a];
+    end
+    eqInds=find(datAll(:,1)==0);
+    uneqInds=find(datAll(:,1)==1);
+    plot(datAll(uneqInds,3),datAll(uneqInds,4),'o-','linewidth',2);
+    plot(datAll(eqInds,3),datAll(eqInds,4),'o-','linewidth',2);
+    
+    
+    
+    xlabel('Reversal probability');
+    ylabel('Gini');
+    figText(gcf,fz,2);
+    % set(gca,'yscale','log','xscale','log','xticklabelmode','auto','xtickmode','auto','yticklabelmode','auto','ytickmode','auto')
+end
+%% 15. ant exp lorenz with theory lorenz
+xx=15;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    fz= 20;
+    clear xy
+    TW=2;
+    % load([pwd,'\R=600P=0.45\GAdat.mat']);
+    load('D:\Projects\Ant_CA_GA\results\giniPlotDat\random seed tw=2 for gini .7 crossover\N=30_tw=2_2017-10-10-19-52.mat');
+    runs = 5;
+    GEN=10;
+    y=bestofgenOUT{GEN};
+    for i=1:runs
+           %prob,ants,time,tw,energymult,0,rech,ptt,tuntip
+        res=CA_FunctionsWill(y,length(y),432,TW,1,0,10,.3,10);
+        [ggruns(i),xy{i}]=Gini(sum(res.markMatr(:,2:end)));
+        ggruns
+%         [ggruns(i),xy{i}]=Gini(bestofgen{GEN});
+%              CA_FunctionsWill(prob,length(prob),ni,2,0,1,rec,ptt);
+        ggruns
+    end
+    yy=cell2mat(cellfun(@(x) x(:,2),xy,'UniformOutput',0));
+    meanY=mean(yy,2);
+    % meanY=mean([a{:}],2);
+    meanG=mean(ggruns);
+    err=std(yy,1,2);
+    cc=parula(15);
+    shadedErrorBar(xy{1}(:,1),meanY,err,{'Color',cc(10,:),'LineWidth',3},1);
+    % text(.651,.829,['Theory'],'Color',cc(10,:),'fontsize',fz);
+    % xlabel('\it{Cum. fraction of workers}');ylabel('{\itCum. fraction of work}');
+    % figText(gcf,18);
+    % xlabel('\it{Cum. fraction of workers}');ylabel('{\itCum. fraction of work}');
+    set(gca,'box','on','linewidth',2);
+    set(gcf,'Position',[1 1 594 562]);
+    
+    
+   load('antfigData10.mat');
+    set(gcf,'renderer','openGL');
+
+    cc=parula(13);
+    ccl=cc(2,:);
+    plot(antfigx,antfigy,'-','color',ccl,'linewidth',2,'markersize',20);
+    patch(antfigxP,antfigyP,ccl,'facealpha',.15,'edgecolor','none');
+    load('antfigData1.mat');
+    plot(antfigx,antfigy,'r-','linewidth',2);
+    patch(antfigxP,antfigyP,'r','facealpha',.15,'edgecolor','none')
+    axis([0 1 0 1]);
+    axis([0 1 0 1]);
+    figText(gcf,fz);
+end
 %% 55 old gini vs generations
 xx=55;
 if(showFigs(showFigs==xx))

@@ -27,7 +27,7 @@ ObjectiveFunction = @GA_CA_code;
 nvars = iii;
 %25 30 35 40 45 50 55 60 65 70
 %%%%%%%%%%%%%%%%%%%%%%
-totgens = 15;
+totgens = 20;
 popsize = 5*nvars;
 tuntip=10;
 prob2turn = .3;
@@ -62,14 +62,14 @@ options = optimoptions(options,'PlotFcn',{{@outputFunc,bestofgen},...
 
 
 %%%%%%%%EQUAL%%%%%%%%%%%%%%%
-% mypop= ones(popsize,nvars);
-% options = optimoptions(options,'InitialPopulation', mypop);
+mypop= ones(popsize,nvars);
+options = optimoptions(options,'InitialPopulation', mypop);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%UNEQUAL%%%%%%%
-mypop= zeros(popsize,nvars);
-mypop(:,nvars)=1;
-options = optimoptions(options,'InitialPopulation', mypop);
+% mypop= zeros(popsize,nvars);
+% mypop(:,nvars)=1;
+% options = optimoptions(options,'InitialPopulation', mypop);
 %%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%RANDOM%%%%%%%%%%%%%%%
