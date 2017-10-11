@@ -35,7 +35,7 @@ patch(antfigxP,antfigyP,'r','facealpha',.15,'edgecolor','none')
 axis([0 1 0 1]);
 text(.2,.8,{['{\itGen} = ',num2str(state.Generation)];...
     ['G=',num2str(ginM,3)];['R=',num2str(rec)];['P=',num2str(ptt)]},'Color','k','FontSize',18)
-set(gca,'xscale','log','yscale','log');
+% set(gca,'xscale','log','yscale','log');
 axis tight;
 hold off;
 end
