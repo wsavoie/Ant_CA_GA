@@ -25,7 +25,7 @@ clear all
 %*15. ant exp lorenz with theory lorenz
 %*55. old gini vs generations
 %************************************************************
-showFigs=[15];
+showFigs=[13];
 fold=uigetdir('D:\Projects\Ant_CA_GA\results');
 filez=dir(fullfile(fold,'*.mat'));
 NF=length(filez);
@@ -554,7 +554,7 @@ if(showFigs(showFigs==xx))
     textz = 'mode 3';
     %uncomment if not using matrix file containing correct tunnel tip=3
     %     res =CA_Functions2(y,length(y),432,2,1,1,600,.3,3);  %probs,numants,numits*10000,width,infEnergy
-    load(['D:\Projects\Ant_CA_GA\results\giniPlotDat\unequalSeed\N=30_tw=2_2017-10-10-14-45.mat']);
+    load(['D:\Projects\Ant_CA_GA\results\giniPlotDat\0.2 mutation rate no cross\50 gen unequal .2 mut\N=30_tw=2_2017-10-11-19-05.mat']);
     
     GENNUM=10;%generation number to plot from
     y=bestofgen{GENNUM};
@@ -595,24 +595,24 @@ if(showFigs(showFigs==xx))
     [giniEq,giniUneq,giniRand]=deal(gens);
     
     %equal seed
-    load(['D:\Projects\Ant_CA_GA\results\giniPlotDat\equalSeed\N=30_tw=2_2017-10-10-17-13.mat']);
+    load(['D:\Projects\Ant_CA_GA\results\giniPlotDat\0.2 mutation rate no cross\50 gen equal.2 mut\N=30_tw=2_2017-10-11-17-11.mat']);
     for i = 1:length(gens)
         [giniEq(i),~]=Gini(bestofgenOUT{i});
     end
     
     %unequal seed
-    load(['D:\Projects\Ant_CA_GA\results\giniPlotDat\unequalSeed\N=30_tw=2_2017-10-10-14-45.mat']);
+    load(['D:\Projects\Ant_CA_GA\results\giniPlotDat\0.2 mutation rate no cross\50 gen unequal .2 mut\N=30_tw=2_2017-10-11-19-05.mat']);
     for i = 1:length(gens)
         [giniUneq(i),~]=Gini(bestofgenOUT{i});
     end
     
     
-%         rand seed
-        load(['D:\Projects\Ant_CA_GA\results\giniPlotDat\random seed tw=2 for gini .7 crossover\N=30_tw=2_2017-10-10-19-52.mat']);
-        for i = 1:length(gens)
-            [giniRand(i),~]=Gini(bestofgenOUT{i});
-        end
-    
+%     %         rand seed
+%     load(['D:\Projects\Ant_CA_GA\results\giniPlotDat\random seed tw=2 for gini .7 crossover\N=30_tw=2_2017-10-10-19-52.mat']);
+%     for i = 1:length(gens)
+%         [giniRand(i),~]=Gini(bestofgenOUT{i});
+%     end
+%     
     plot(gens,giniEq   ,'-','linewidth',3,'color',cc(1,:));
     plot(gens,giniUneq ,'-','linewidth',3,'color',cc(2,:));
     % 	plot(gens,giniRand ,'-','linewidth',3,'color',cc(5,:));
@@ -672,13 +672,12 @@ if(showFigs(showFigs==xx))
     GEN=10;
     y=bestofgenOUT{GEN};
     for i=1:runs
-           %prob,ants,time,tw,energymult,0,rech,ptt,tuntip
+        %prob,ants,time,tw,energymult,0,rech,ptt,tuntip
         res=CA_FunctionsWill(y,length(y),432,TW,1,0,10,.3,10);
         [ggruns(i),xy{i}]=Gini(sum(res.markMatr(:,2:end)));
         ggruns
-%         [ggruns(i),xy{i}]=Gini(bestofgen{GEN});
-%              CA_FunctionsWill(prob,length(prob),ni,2,0,1,rec,ptt);
-        ggruns
+        %         [ggruns(i),xy{i}]=Gini(bestofgen{GEN});
+        %              CA_FunctionsWill(prob,length(prob),ni,2,0,1,rec,ptt);
     end
     yy=cell2mat(cellfun(@(x) x(:,2),xy,'UniformOutput',0));
     meanY=mean(yy,2);
@@ -695,9 +694,9 @@ if(showFigs(showFigs==xx))
     set(gcf,'Position',[1 1 594 562]);
     
     
-   load('antfigData10.mat');
+    load('antfigData10.mat');
     set(gcf,'renderer','openGL');
-
+    
     cc=parula(13);
     ccl=cc(2,:);
     plot(antfigx,antfigy,'-','color',ccl,'linewidth',2,'markersize',20);

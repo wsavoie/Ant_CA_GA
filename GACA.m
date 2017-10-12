@@ -27,7 +27,7 @@ ObjectiveFunction = @GA_CA_code;
 nvars = iii;
 %25 30 35 40 45 50 55 60 65 70
 %%%%%%%%%%%%%%%%%%%%%%
-totgens = 20;
+totgens = 50;
 popsize = 5*nvars;
 tuntip=10;
 prob2turn = .3;
@@ -42,10 +42,10 @@ bestofgen= cell(1,totgens);
 
 
 
-crossOverFrac = .7; %no crossover
+crossOverFrac = 0; %no crossover
 % options = optimoptions(@ga,'MutationFcn',{@mutationgaussian,.2,.5});
-options = optimoptions(@ga,'MutationFcn', {@mutationadaptfeasible});
-
+% options = optimoptions(@ga,'MutationFcn', {@mutationadaptfeasible});
+options = optimoptions('ga','MutationFcn', {@mutationuniform, .2});
 %%%%%%%%%%%%%%%%%%%%normal%%%%%%%%%%%%%%%%%%%%
 options = optimoptions(options,'PlotFcn',{{@outputFunc,bestofgen},...
     {@gaplotlorenzcurve,bestofgen,numIts,rechargeSteps,prob2turn,tuntip,TW,energyMult}}, ...
