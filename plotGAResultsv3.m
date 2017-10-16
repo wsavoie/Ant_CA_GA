@@ -25,7 +25,7 @@ clear all
 %*15. ant exp lorenz with theory lorenz
 %*55. old gini vs generations
 %************************************************************
-showFigs=[13];
+showFigs=[12 15];
 fold=uigetdir('D:\Projects\Ant_CA_GA\results');
 filez=dir(fullfile(fold,'*.mat'));
 NF=length(filez);
@@ -547,18 +547,19 @@ if(showFigs(showFigs==xx))
     figure(xx)
     hold on;
     fz= 20;
-    load(fullfile(pwd,'results','v1.mat'));
-    y=bestofgen{end};
+%     load(fullfile(pwd,'results','v1.mat'));
+%     y=bestofgen{end};
     TW=2;
     co =[184 77 157]./255;
     textz = 'mode 3';
     %uncomment if not using matrix file containing correct tunnel tip=3
     %     res =CA_Functions2(y,length(y),432,2,1,1,600,.3,3);  %probs,numants,numits*10000,width,infEnergy
-    load(['D:\Projects\Ant_CA_GA\results\giniPlotDat\0.2 mutation rate no cross\50 gen unequal .2 mut\N=30_tw=2_2017-10-11-19-05.mat']);
-    
-    GENNUM=10;%generation number to plot from
+%     load(['D:\Projects\Ant_CA_GA\results\longRuns 50 gens recharge\long rand 50 gens\N=30_tw=2_2017-10-16-02-45.mat']);
+    load(fullfile(fold,filez(1).name));
+    GENNUM=50;%generation number to plot from
     y=bestofgen{GENNUM};
-    res=CA_FunctionsWill(y,length(y),432,TW,1,1,10,.3,10);
+     res=CA_FunctionsWill(y,length(y),numIts,TW,energyMult,0,rechargeSteps,prob2turn,tuntip);
+%     res=CA_FunctionsWill(y,length(y),432,TW,1,1,10,.3,10);
     z = zeros(1,29);
     z(30)=1;
     [~,eqLine]=Gini(ones(1,30));
@@ -590,32 +591,34 @@ if(showFigs(showFigs==xx))
     hold on;
     cc=get(gca,'colororder');
     fz= 20;
-    gens=0:20;
+    gens=0:50;
     %initialize gini vars
     [giniEq,giniUneq,giniRand]=deal(gens);
     
-    %equal seed
-    load(['D:\Projects\Ant_CA_GA\results\giniPlotDat\0.2 mutation rate no cross\50 gen equal.2 mut\N=30_tw=2_2017-10-11-17-11.mat']);
-    for i = 1:length(gens)
-        [giniEq(i),~]=Gini(bestofgenOUT{i});
-    end
     
-    %unequal seed
-    load(['D:\Projects\Ant_CA_GA\results\giniPlotDat\0.2 mutation rate no cross\50 gen unequal .2 mut\N=30_tw=2_2017-10-11-19-05.mat']);
-    for i = 1:length(gens)
-        [giniUneq(i),~]=Gini(bestofgenOUT{i});
-    end
-    
-    
-%     %         rand seed
-%     load(['D:\Projects\Ant_CA_GA\results\giniPlotDat\random seed tw=2 for gini .7 crossover\N=30_tw=2_2017-10-10-19-52.mat']);
+%     %unequal seed
+%     load(['D:\Projects\Ant_CA_GA\results\giniPlotDat\0.2 mutation rate no cross\50 gen equal .4 mut windows\N=30_tw=2_2017-10-13-13-07.mat']);
 %     for i = 1:length(gens)
-%         [giniRand(i),~]=Gini(bestofgenOUT{i});
+%         [giniUneq(i),~]=Gini(bestofgenOUT{i});%out goes down
 %     end
+    
+    
+    %equal seed
+    load(['D:\Projects\Ant_CA_GA\results\long equal 50 gens\N=30_tw=2_2017-10-14-03-05']);
+    for i = 1:length(gens)
+        [giniEq(i),~]=Gini(bestofgen{i}); %out goes down
+%         res=CA_FunctionsWill(bestofgen{i},length(bestofgen{i}),432,TW,1,1,10,.3,10);
+%         [giniEq(i),~]=Gini(sum(res.markMatr(:,2:end)));
+    end
+    %rand seed
+    load(['D:\Projects\Ant_CA_GA\results\long rand 50 gens\N=30_tw=2_2017-10-16-02-45.mat']);
+    for i = 1:length(gens)
+        [giniRand(i),~]=Gini(bestofgen{i});%out goes down
+    end
 %     
     plot(gens,giniEq   ,'-','linewidth',3,'color',cc(1,:));
     plot(gens,giniUneq ,'-','linewidth',3,'color',cc(2,:));
-    % 	plot(gens,giniRand ,'-','linewidth',3,'color',cc(5,:));
+    plot(gens,giniRand ,'-','linewidth',3,'color',cc(5,:));
     
     axis([0 length(gens)-1 0 1]);
     
@@ -667,13 +670,15 @@ if(showFigs(showFigs==xx))
     clear xy
     TW=2;
     % load([pwd,'\R=600P=0.45\GAdat.mat']);
-    load('D:\Projects\Ant_CA_GA\results\giniPlotDat\random seed tw=2 for gini .7 crossover\N=30_tw=2_2017-10-10-19-52.mat');
-    runs = 5;
-    GEN=10;
+%     load('D:\Projects\Ant_CA_GA\results\longRuns 50 gens recharge\long rand 50 gens\N=30_tw=2_2017-10-16-02-45.mat');
+    load(fullfile(fold,filez(1).name));
+    runs = 2;
+    GEN=50;
     y=bestofgenOUT{GEN};
     for i=1:runs
         %prob,ants,time,tw,energymult,0,rech,ptt,tuntip
-        res=CA_FunctionsWill(y,length(y),432,TW,1,0,10,.3,10);
+        
+        res=CA_FunctionsWill(y,length(y),numIts,TW,energyMult,0,rechargeSteps,prob2turn,tuntip);
         [ggruns(i),xy{i}]=Gini(sum(res.markMatr(:,2:end)));
         ggruns
         %         [ggruns(i),xy{i}]=Gini(bestofgen{GEN});
