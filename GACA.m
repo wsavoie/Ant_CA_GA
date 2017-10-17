@@ -1,4 +1,4 @@
-for iii=([0 2])
+for iii=([0 1 2])
     clearvars -except iii
     % ObjectiveFunction = @simple_fitness;
     % nvars = 4;    % Number of variables
@@ -36,18 +36,18 @@ for iii=([0 2])
     numIts=432*4;
     energyMult=0;
     TW=2;
-    mutType=1; %0=adapt 1=uniform
+    mutType=0; %0=adapt 1=uniform
     mutRate=.4;
     LB = zeros(1,nvars);
     UB = ones(1,nvars);
     bestofgen= cell(1,totgens);
     initSeed=iii; %0=equal 1=rand 2=unequal
-    
-    
-    crossOverFrac = 0; %no crossover
+    crossOverFrac = 0.7; %no crossover    
+
     % options = optimoptions(@ga,'MutationFcn',{@mutationgaussian,.2,.5});
     if mutType==0
         options = optimoptions(@ga,'MutationFcn', {@mutationadaptfeasible});
+        mutRate=0;
     elseif mutType==1
         options = optimoptions(@ga,'MutationFcn', {@mutationuniform, mutRate});
     end
@@ -136,7 +136,8 @@ for iii=([0 2])
         ['TW = ',num2str(TW),';'],...
         ['MutType = ',num2str(mutType),';'],...
         ['MutRate = ',num2str(mutRate),';'],...
-        ['initSeed= ',num2str(initSeed),';']);
+        ['initSeed= ',num2str(initSeed),';'],...
+        ['crossOverFrac= ',num2str(crossOverFrac),';']);
     
     fclose(fileID);
     close all;
