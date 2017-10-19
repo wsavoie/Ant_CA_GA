@@ -1,4 +1,4 @@
-for iii=([0 1 2])
+for iii=([2 3 5 8 10 12 15 18 20 25 50 100])
     clearvars -except iii
     % ObjectiveFunction = @simple_fitness;
     % nvars = 4;    % Number of variables
@@ -25,7 +25,8 @@ for iii=([0 1 2])
     %%%%%%%%%%%%%%%%%%%%%%
     
     %%%%%%%regular%%%%%%%%
-    nvars = 30;
+%     nvars = 30;
+    nvars = iii;
     %25 30 35 40 45 50 55 60 65 70
     %%%%%%%%%%%%%%%%%%%%%%
     totgens = 50;
@@ -36,13 +37,13 @@ for iii=([0 1 2])
     numIts=432*4;
     energyMult=0;
     TW=2;
-    mutType=0; %0=adapt 1=uniform
+    mutType=1; %0=adapt 1=uniform
     mutRate=.4;
     LB = zeros(1,nvars);
     UB = ones(1,nvars);
     bestofgen= cell(1,totgens);
-    initSeed=iii; %0=equal 1=rand 2=unequal
-    crossOverFrac = 0.7; %no crossover    
+    initSeed=1; %0=equal 1=rand 2=unequal
+    crossOverFrac = 0.0; %no crossover    
 
     % options = optimoptions(@ga,'MutationFcn',{@mutationgaussian,.2,.5});
     if mutType==0
