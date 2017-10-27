@@ -1,4 +1,4 @@
-for iii=([2 3 5 8 10 12 15 18 20 25 50 100])
+for iii=([12 10])
     clearvars -except iii
     % ObjectiveFunction = @simple_fitness;
     % nvars = 4;    % Number of variables
@@ -30,7 +30,7 @@ for iii=([2 3 5 8 10 12 15 18 20 25 50 100])
     %25 30 35 40 45 50 55 60 65 70
     %%%%%%%%%%%%%%%%%%%%%%
     totgens = 50;
-    popsize = 5*nvars;
+    popsize = 10*nvars;
     tuntip=10;
     prob2turn = .3;
     rechargeSteps = 600;
