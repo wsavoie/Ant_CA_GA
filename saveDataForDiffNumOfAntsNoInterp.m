@@ -1,15 +1,17 @@
+fold=uigetdir('D:\Projects\Ant_CA_GA\results');
+filez=dir(fullfile(fold,'*.mat'));
+NF=length(filez);
 clear s;
-[filez,fold]=uigetfile(fullfile('D:\Projects\Ant_CA_GA\results','*.mat'));
-na=[2 3 5 8 10 12 15 18 20 25 30 50 100];
 clear ress;
-ress=cell(length(na),1);
+% ress=cell(length(na),1);
 % filez=uigetfile(fullfile('D:\Projects\Ant_CA_GA\results','*.mat'));
-load(fullfile(fold,filez));
+% load(fullfile(fold,filez));
 % for p=[prob2turn]
 %    for p=[0.001 .01 .1 .2 .3 .4 .005 .05 .5 .6 .7 .8 .9 .0025 .025 .35 .45 .075 .0075] 
     clear res ress;
-    ress=cell(length(na),1);
-    for i=1:length(na)
+    ress=cell(NF,1);
+    for i=1:NF
+        load(fullfile(fold,filez(i).name));
         %%%%%%%%unequal%%%%%%%%%
 %         clear s
 %         s.x =1;
@@ -19,11 +21,12 @@ load(fullfile(fold,filez));
         %%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%GA unequal%%%%%%%%%
         clear y;
-        pp=InterpolateGAProbsFromProb(na(i),bestofgen{end});
+%         pp=InterpolateGAProbsFromProb(na(i),bestofgen{end});
+%         pp=bestofgen{end};
         %%%%%%%%%%%%%%%%%%%%%%%
         
         %%%%%%%%%%%equal%%%%%%%%%%%%%
-%         pp=ones(1,na(i));
+        pp=ones(1,nvars);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         ress{i}=CA_FunctionsWill(pp,length(pp),432,TW,energyMult,1,rechargeSteps,prob2turn,tuntip);
 %         ress{i}=CA_Functions2(y,length(y),432,2,1,1,300,p,10);  %probs,numants,numits*10000,width,infEnergy
@@ -40,9 +43,9 @@ load(fullfile(fold,filez));
         feq='uneq';
     end
     feq
-    for i=1:length(na)
+    for i=1:NF
         res=ress{i};
-        saveFold = ['D:\Projects\Ant_CA_GA\results\longRuns 50 gens recharge .4 mut\qvrho\interpfrom30\diffN',feq];
+        saveFold = ['D:\Projects\Ant_CA_GA\results\longRuns 50 gens recharge .4 mut\qvrho\non-interped\diffN',feq];
         if(~exist(saveFold))
             mkdir(saveFold);
         end
