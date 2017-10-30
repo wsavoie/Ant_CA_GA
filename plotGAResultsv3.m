@@ -25,9 +25,11 @@ clear all
 %*15. ant exp lorenz with theory lorenz
 %*16. plot q_bar vs rho_bar old type different ant num from single prob
 %*17&18. V vs. N for 30 ant interpolated
+%*19. code for another file to make movie from road data
+%*20. excavation rate vs. time
 %*55. old gini vs generations
 %************************************************************
-showFigs=[16];
+showFigs=[2];
 % showFigs=[7 16];
 fold=uigetdir('D:\Projects\Ant_CA_GA\results');
 filez=dir(fullfile(fold,'*.mat'));
@@ -257,15 +259,15 @@ if(any(ismember(showFigs,xx)))
             its=432;
             load(fullfile(fold,filez(i).name));
             if(j==0) %eq
-            pp=ones(1,nvars);
-            res=CA_FunctionsWill(pp,nvars,its,TW,...
-                energyMult,1,rechargeSteps,prob2turn,tuntip);
+                pp=ones(1,nvars);
+                res=CA_FunctionsWill(pp,nvars,its,TW,...
+                    energyMult,1,rechargeSteps,prob2turn,tuntip);
             else    %uneq
-            %         res=CA_FunctionsWill(bestofgen{end},length(bestofgen{end}),numIts,TW,...
-            res=CA_FunctionsWill(bestofgen{end},length(bestofgen{end}),432,TW,...
-                energyMult,1,rechargeSteps,prob2turn,tuntip);
+                %         res=CA_FunctionsWill(bestofgen{end},length(bestofgen{end}),numIts,TW,...
+                res=CA_FunctionsWill(bestofgen{end},length(bestofgen{end}),432,TW,...
+                    energyMult,1,rechargeSteps,prob2turn,tuntip);
             end
-           
+            
             pellet2grow=res.pell2grow;
             pellPerCm = pellet2grow*TW*2; %tunnwidth=2,another 2 for 1site=.5 cm
             pellsTot = sum(sum(res.markMatr(:,2:end)))/res.pause2dig/pellPerCm;
@@ -308,7 +310,7 @@ if(showFigs(showFigs==xx))
         load(fullfile(fold,filez(i).name));
         if nvars==30
             %%%%%is commented line diff?
-%             %     prob=bestofgen{end};
+            %             %     prob=bestofgen{end};
             prob= sort(bestofgen{end}/sum(bestofgen{end}));
         end
     end
@@ -322,14 +324,14 @@ if(showFigs(showFigs==xx))
         startTime=startTime*7200;
         pp=InterpolateGAProbsFromProb(nvars,prob);
         
-%         res=CA_FunctionsWill(pp,length(pp),numIts,TW,...
-        res=CA_FunctionsWill(pp,length(pp),432,TW,...    
+        %         res=CA_FunctionsWill(pp,length(pp),numIts,TW,...
+        res=CA_FunctionsWill(pp,length(pp),432,TW,...
             energyMult,1,rechargeSteps,prob2turn,tuntip); %tuntip instead of 5
         singleLane = sum(res.occupied(startTime+1:stopTime,:),2)./TW; %/2 for 2 lanes
         
         if isfield(res,'density')
             dens = res.density(startTime+1:stopTime,:); %/2 for 2 lanes
-
+            
         end
         singleFlow = sum(res.flow(startTime+1:stopTime,:),2)./TW;
         tunLen=(res.tunLength(startTime+1:stopTime,2));
@@ -363,7 +365,7 @@ if(showFigs(showFigs==xx))
             rhom(i) = mean(newrho);
         end
         %
-%         rhom(i) = mean(dens);
+        %         rhom(i) = mean(dens);
         ants(i)=nvars;
     end
     %sort runs
@@ -449,15 +451,18 @@ if(showFigs(showFigs==xx))
     cc=get(gca,'colororder');
     
     unitless=0;
-    
+    TW=2;
     datAll=zeros(NF,4);     %type,ant#,revProb,ExcavationAmount
     for i=1:NF
         load(fullfile(fold,filez(i).name));
         [~,val]=parseFileNames(filez(i).name,1);
         xt=res.tunLength(:,1)*.5/3600;
         pellet2grow=res.pell2grow;
-        pellPerCm = pellet2grow*2*2; %tunnwidth=2,another 2 for 1site=.5 cm
-        pellsTot = sum(sum(res.markMatr(:,2:end)))/res.pause2dig/pellPerCm;
+%         pellPerCm = pellet2grow*2*2; %tunnwidth=2,another 2 for 1site=.5 cm
+%         pellsTot = sum(sum(res.markMatr(:,2:end)))/res.pause2dig/pellPerCm;
+        pellPerBL = pellet2grow*TW; %tunnwidth=2,another 2 for 1site=.5 cm
+        pellsTot = sum(sum(res.markMatr(:,2:end)))/res.pause2dig/pellPerBL;
+        
         datAll(i,:)=[val(1),res.numants,val(2),pellsTot];
     end
     eq=datAll(datAll(:,1)==0,:); %equal distrib= type 0, square marker
@@ -465,26 +470,26 @@ if(showFigs(showFigs==xx))
     
     % plot(eq(:,3),eq(:,4),'s-','markerfacecolor',cc(1,:),'MarkerSize',15,'MarkerEdgeColor','k','LineWidth',2);
     % plot(uneq(:,3),uneq(:,4),'o-','markerfacecolor',cc(2,:),'MarkerSize',15,'MarkerEdgeColor','k','LineWidth',2);
-    if(unitless)
-        TW=size(res.occupied,2);
-        ylabel('V/TW');
-%         set(gca,'xtick',[0, .15 ,0.25 ,0.5,0.75 ,1], 'xticklabel',{'0','0.15','','0.5','','1'}, 'ytick',[0.5 1.0 1.5 1.82 2],'yticklabel', {'0.5','1','1.5','1.82','2'},'fontsize',fz);
-    else
-        TW=1;
-        ylabel('V (cm)');
-%         set(gca,'xtick',[0, .15 ,0.25 ,0.5,0.75 ,1], 'xticklabel',{'0','0.15','','0.5','','1'}, 'ytick',[1 2 3 3.642 4],'yticklabel', {'1','2','3','3.64','4'},'fontsize',fz);
-    end
-    
+%     if(unitless)
+%         TW=size(res.occupied,2);
+%         ylabel('V/TW');
+%         %         set(gca,'xtick',[0, .15 ,0.25 ,0.5,0.75 ,1], 'xticklabel',{'0','0.15','','0.5','','1'}, 'ytick',[0.5 1.0 1.5 1.82 2],'yticklabel', {'0.5','1','1.5','1.82','2'},'fontsize',fz);
+%     else
+%         TW=1;
+%         ylabel('V (cm)');
+%         %         set(gca,'xtick',[0, .15 ,0.25 ,0.5,0.75 ,1], 'xticklabel',{'0','0.15','','0.5','','1'}, 'ytick',[1 2 3 3.642 4],'yticklabel', {'1','2','3','3.64','4'},'fontsize',fz);
+%     end
+%     
     %%%%%with markers%%%
     %     plot(eq(:,3),eq(:,4)/TW,'s-','markerfacecolor',cc(1,:),'MarkerSize',6,'MarkerEdgeColor','k','LineWidth',1.4);
     %     plot(uneq(:,3),uneq(:,4)/TW,'o-','markerfacecolor',cc(2,:),'MarkerSize',6,'MarkerEdgeColor','k','LineWidth',1.4);
     
     %%%%%without markers%%%%%%%%
-    plot(eq(:,3),eq(:,4)/TW,'-','LineWidth',3);
-    plot(uneq(:,3),uneq(:,4)/TW,'-','LineWidth',3);
+    plot(eq(:,3),eq(:,4),'-','LineWidth',3);
+    plot(uneq(:,3),uneq(:,4),'-','LineWidth',3);
     
     [mRev,revInd]=max(uneq(:,4));
-    pts('mRev=',mRev,' reversal=',uneq(revInd,3));
+%     pts('mRev=',mRev,' reversal=',uneq(revInd,3));
     
     plot([uneq(revInd,3),uneq(revInd,3)],[0,mRev]/TW,'r','linewidth',2);
     plot([0,uneq(revInd,3)],[mRev,mRev]/TW,'r','linewidth',2);
@@ -492,7 +497,11 @@ if(showFigs(showFigs==xx))
     
     
     xlabel('Reversal probability');
+    ylabel('V/TW (BL/BW)');
     figText(gcf,fz,2);
+    
+    set(gca,'xtick',[0 .1 .25 .5 .75 1])
+    set(gca,'ytick',[ 5 10 15 20 25 30],'yticklabel',{'','10','','20','','30'})
     % set(gca,'yscale','log','xscale','log','xticklabelmode','auto','xtickmode','auto','yticklabelmode','auto','ytickmode','auto')
 end
 
@@ -503,25 +512,28 @@ if(showFigs(showFigs==xx))
     figure(xx(1))
     hold on;
     fz= 20;
-    TW=1;
+    for qq=[2,3,4]
+    TW=qq;
     load(fullfile(pwd,'gini.mat'));
     gDatAll=zeros(length(giniX),4);
-    for i=1:length(giniX)
-        res=CA_FunctionsWill(giniY(i,:),length(giniY(i,:)),432*4,TW,...
+    tt=432*4;
+    parfor i=1:length(giniX)
+        res=CA_FunctionsWill(giniY(i,:),length(giniY(i,:)),tt,TW,...
             0,0,600,.3,10);
-        xt=res.tunLength(:,1)*.5/3600;
         pellet2grow=res.pell2grow;
-        pellPerCm = pellet2grow*2*2; %tunnwidth=2,another 2 for 1site=.5 cm
-        pellsTot = sum(sum(res.markMatr(:,2:end)))/res.pause2dig/pellPerCm;
+%         pellPerCm = pellet2grow*2*2; %tunnwidth=2,another 2 for 1site=.5 cm
+        pellPerBL = pellet2grow*TW; %tunnwidth=2,took out extra 2 because we are plotting vs. BL
+        pellsTot = sum(sum(res.markMatr(:,2:end)))/res.pause2dig/pellPerBL;
         Gout=Gini(sum(res.markMatr(:,2:end)));
         gDatAll(i,:)=[res.numants,pellsTot,G(i),Gout];
     end
-    %Gini In
-    plot(gDatAll(:,3),gDatAll(:,2)/TW,'o-','markerfacecolor','w','linewidth',2,'markersize',7);
-    %Gini Out
-    %     plot(gDatAll(:,4),gDatAll(:,2),'o-','markerfacecolor','w','linewidth',2,'markersize',7);
-    xlabel('Gini');
-    ylabel('V/TW');
+    %with time in denom
+%     plot(gDatAll(:,3),gDatAll(:,2)*3600/((tt/2)*100),'o-','markerfacecolor','w','linewidth',2,'markersize',7);
+%     without time in denom 
+    plot(gDatAll(:,3),gDatAll(:,2),'o-','markerfacecolor','w','linewidth',2,'markersize',7);
+        xlabel('Gini');
+%     ylabel('V/TW (BL/(BW*h))');
+        ylabel('V/TW (BL/BW)');
     %     set(gca,'xtick',[0, .15 ,0.25 ,0.5,0.75 ,1], 'xticklabel',{'0','0.15','','0.5','','1'}, 'ytick',[1 2 3 3.642 4],'yticklabel', {'1','2','3','3.64','4'},'fontsize',fz);
     %     set(gca,'yscale','log','xscale','log','xticklabelmode','auto','xtickmode','auto','yticklabelmode','auto','ytickmode','auto')
     
@@ -529,8 +541,8 @@ if(showFigs(showFigs==xx))
     xlim([0, 1]);
     yl=ylim;
     ylim([yl(1)*.975,yl(2)*1.025]);
-    set(gca,'xtick',[0, .2 ,.4 ,.6 ,.8 ,1]);
-    
+    set(gca,'xtick',[0, .25 ,0.5 ,.75 ,1]);
+    end
 end
 
 %% 11. plot gini in vs gini out with multiple runs
@@ -547,7 +559,7 @@ if(showFigs(showFigs==xx))
         for j=1:numIts
             res=CA_FunctionsWill(giniY(i,:),length(giniY(i,:)),432,TW,...
                 1,1,10,.3,10);
-            xt=res.tunLength(:,1)*.5/3600;
+
             pellet2grow=res.pell2grow;
             pellPerCm = pellet2grow*2*2; %tunnwidth=2,another 2 for 1site=.5 cm
             pellsTot = sum(sum(res.markMatr(:,2:end)))/res.pause2dig/pellPerCm;
@@ -758,7 +770,7 @@ if(showFigs(showFigs==xx))
     figure(xx)
     hold on;
     titl='Traffic (CA)';
-%     load(fullfile(fold,filez.name)); %load up so I can get bestofgens var
+    %     load(fullfile(fold,filez.name)); %load up so I can get bestofgens var
     % eq=0; %% zero for inequal work
     fz=20;
     TW=2;
@@ -768,13 +780,13 @@ if(showFigs(showFigs==xx))
             %     fold ='\eqResSavesInfEnergy\';
             %     fold ='\eqResSavesInfEnergyPell600\';
             folddz=fullfile(fold,'diffNeq');
-%             fold = ['D:\Projects\Ant_CA_GA\results\longRuns 50 gens recharge .4 mut\diffNeq'];
+            %             fold = ['D:\Projects\Ant_CA_GA\results\longRuns 50 gens recharge .4 mut\diffNeq'];
             mark = 's';
             lw=2;
         else
             %     fold ='\uneqResSavesInfEnergy\';
             %     fold ='\uneqResSavesInfEnergyPell600\';
-%             fold =['D:\Projects\Ant_CA_GA\results\longRuns 50 gens recharge .4 mut\diffNuneq'];
+            %             fold =['D:\Projects\Ant_CA_GA\results\longRuns 50 gens recharge .4 mut\diffNuneq'];
             folddz=fullfile(fold,'diffNuneq');
             mark = 'o';
             lw = 1.9;
@@ -805,59 +817,59 @@ if(showFigs(showFigs==xx))
         for i =1:length(flist)
             flist(i).name;
             load(fullfile(folddz,flist(i).name));
-        stopTime =3;
-        startTime=.25;
-        minz = 60*(stopTime-startTime); %%%uncomment
-        %   minz = 60*(stopTime-startTime);
-        stopTime = stopTime*7200;
-        startTime=startTime*7200;
-%         pp=InterpolateGAProbsFromProb(nvars,prob);
-%         
-% %         res=CA_FunctionsWill(pp,length(pp),numIts,TW,...
-%         res=CA_FunctionsWill(pp,length(pp),432,TW,...    
-%             energyMult,1,rechargeSteps,prob2turn,tuntip); %tuntip instead of 5
-        
-        singleLane = sum(res.occupied(startTime+1:stopTime,:),2)./TW; %/2 for 2 lanes
-        
-        if isfield(res,'density')
-            dens = res.density(startTime+1:stopTime,:); %/2 for 2 lanes
-
-        end
-        singleFlow = sum(res.flow(startTime+1:stopTime,:),2)./TW;
-        tunLen=(res.tunLength(startTime+1:stopTime,2));
-        ts=120*minz; %timesteps to average over 120ts/min *60min/hour
-        %     ss=size(res.occupied(1:stopTime,1));
-        
-        %         newq = reshape(singleFlow(1:end),ts,size(singleFlow(1:end),1)/ts);
-        %         tunLen=reshape(tunLen(1:end),ts,size(tunLen(1:end),1)/ts);
-        %         newrho=reshape(singleLane(1:end),ts,size(singleLane(1:end),1)/ts);
-        
-        %get all pellets dug over start to stop time, number of pellets
-        %represents 2x trips (1 to tunnel tip, and 1 back with pellet) we
-        %can get successful flow rate this way
-        qq=sum(sum(res.markMatr(startTime:stopTime,2:end)))/res.pause2dig;
-        
-        %(successful excavations)/(system TS *1s/2ts)= exc/s
-        newq=qq/(ts/2);
-        %each exc is 2 ant appearances: 2(ants/exc)*(exc/s)= (ants/s)
-        newq=newq*2;
-        tunLen=reshape(tunLen(1:end),ts,size(tunLen(1:end),1)/ts);
-        
-        newrho=reshape(singleLane(1:end),ts,size(singleLane(1:end),1)/ts)./tunLen;%ants/(bL*lanes)
-        
-        
-        qm(i) = mean(newq)/2; %%ants/(lanes*sec)
-        tunLen=mean(tunLen);
-        d=0; %set zero for old way
-        if d
-            rhom(i) = mean(dens);
-        else
-            rhom(i) = mean(newrho);
-        end
-        %
-%         rhom(i) = mean(dens);
-%         ants(i)=nvars;
-        ants(i)=res.numants;
+            stopTime =3;
+            startTime=.25;
+            minz = 60*(stopTime-startTime); %%%uncomment
+            %   minz = 60*(stopTime-startTime);
+            stopTime = stopTime*7200;
+            startTime=startTime*7200;
+            %         pp=InterpolateGAProbsFromProb(nvars,prob);
+            %
+            % %         res=CA_FunctionsWill(pp,length(pp),numIts,TW,...
+            %         res=CA_FunctionsWill(pp,length(pp),432,TW,...
+            %             energyMult,1,rechargeSteps,prob2turn,tuntip); %tuntip instead of 5
+            
+            singleLane = sum(res.occupied(startTime+1:stopTime,:),2)./TW; %/2 for 2 lanes
+            
+            if isfield(res,'density')
+                dens = res.density(startTime+1:stopTime,:); %/2 for 2 lanes
+                
+            end
+            singleFlow = sum(res.flow(startTime+1:stopTime,:),2)./TW;
+            tunLen=(res.tunLength(startTime+1:stopTime,2));
+            ts=120*minz; %timesteps to average over 120ts/min *60min/hour
+            %     ss=size(res.occupied(1:stopTime,1));
+            
+            %         newq = reshape(singleFlow(1:end),ts,size(singleFlow(1:end),1)/ts);
+            %         tunLen=reshape(tunLen(1:end),ts,size(tunLen(1:end),1)/ts);
+            %         newrho=reshape(singleLane(1:end),ts,size(singleLane(1:end),1)/ts);
+            
+            %get all pellets dug over start to stop time, number of pellets
+            %represents 2x trips (1 to tunnel tip, and 1 back with pellet) we
+            %can get successful flow rate this way
+            qq=sum(sum(res.markMatr(startTime:stopTime,2:end)))/res.pause2dig;
+            
+            %(successful excavations)/(system TS *1s/2ts)= exc/s
+            newq=qq/(ts/2);
+            %each exc is 2 ant appearances: 2(ants/exc)*(exc/s)= (ants/s)
+            newq=newq*2;
+            tunLen=reshape(tunLen(1:end),ts,size(tunLen(1:end),1)/ts);
+            
+            newrho=reshape(singleLane(1:end),ts,size(singleLane(1:end),1)/ts)./tunLen;%ants/(bL*lanes)
+            
+            
+            qm(i) = mean(newq)/2; %%ants/(lanes*sec)
+            tunLen=mean(tunLen);
+            d=0; %set zero for old way
+            if d
+                rhom(i) = mean(dens);
+            else
+                rhom(i) = mean(newrho);
+            end
+            %
+            %         rhom(i) = mean(dens);
+            %         ants(i)=nvars;
+            ants(i)=res.numants;
         end
         
         %sort runs
@@ -882,11 +894,11 @@ if(showFigs(showFigs==xx))
             1+0.5*(numcolors-1)/numcolors:(numcolors-1)/numcolors:numcolors,...
             'YTickLabel',ants, 'YLim', [1 numcolors]); %[]=ants
         
-%         set(gca,'XTick',[0.25 0.5],'YTick',[0 .1 .2],'XLim',[0.045 0.55],'YLim',[0,0.15]);
-%             set(gca,'XTick',[0.025 0.05 0.075],'YTick',[0.05 0.1 0.15],'yTicklabel',[], 'xTicklabel',[],'fontsize',fz);
-                    set(gca,'XTick',[0.025 0.05 0.075],'YTick',[0.05 0.1 0.15],'fontsize',fz);
-
-            %     set(cbarHandle,'fontsize',18');
+        %         set(gca,'XTick',[0.25 0.5],'YTick',[0 .1 .2],'XLim',[0.045 0.55],'YLim',[0,0.15]);
+        %             set(gca,'XTick',[0.025 0.05 0.075],'YTick',[0.05 0.1 0.15],'yTicklabel',[], 'xTicklabel',[],'fontsize',fz);
+        set(gca,'XTick',[0.025 0.05 0.075],'YTick',[0.05 0.1 0.15],'fontsize',fz);
+        
+        %     set(cbarHandle,'fontsize',18');
         %     axis([0 .4 0 .075])
         if(res.infEnergy)
             En=' E=\infty';
@@ -898,11 +910,11 @@ if(showFigs(showFigs==xx))
         set(gca,'box','on','linewidth',2);
         set(gca,'position',[ 0.1380    0.1173    0.6301    0.8077]);
         set(gcf,'position',[   680   495   576   483]);
-            xlab=xlabel('\rho (ants/(BL*lane)) ');
-    %     ylab=ylabel('q (ants/(BL\cdotmin)');
-    ylab=ylabel('q (ants/(s\cdotlane))');
-    ylim([0,.15]);
-
+        xlab=xlabel('\rho (ants/(BL*lane)) ');
+        %     ylab=ylabel('q (ants/(BL\cdotmin)');
+        ylab=ylabel('q (ants/(s\cdotlane))');
+        ylim([0,.15]);
+        
     end
 end
 %% *MAKES 17&18* V vs. N for 30 ant interpolated
@@ -919,20 +931,20 @@ if(any(ismember(showFigs,xx)))
         for i=1:length(ants)
             load(['D:\Projects\Ant_CA_GA\results\longRuns 50 gens recharge .4 mut\1-100_n_ants\N=30_tw=2_2017-10-22-23-01.mat']);
             if(j==0) %eq
-            pp=ones(1,ants(i));
-            res=CA_FunctionsWill(pp,ants(i),432,TW,...
-                energyMult,1,rechargeSteps,prob2turn,tuntip);
+                pp=ones(1,ants(i));
+                res=CA_FunctionsWill(pp,ants(i),432,TW,...
+                    energyMult,1,rechargeSteps,prob2turn,tuntip);
             else    %uneq
-            pp=InterpolateGAProbsFromProb(ants(i),bestofgen{end});
-    %         res=CA_FunctionsWill(bestofgen{end},length(bestofgen{end}),numIts,TW,...
-            res=CA_FunctionsWill(pp,length(pp),432,TW,...
-                energyMult,1,rechargeSteps,prob2turn,tuntip);
+                pp=InterpolateGAProbsFromProb(ants(i),bestofgen{end});
+                %         res=CA_FunctionsWill(bestofgen{end},length(bestofgen{end}),numIts,TW,...
+                res=CA_FunctionsWill(pp,length(pp),432,TW,...
+                    energyMult,1,rechargeSteps,prob2turn,tuntip);
             end
             xt=res.tunLength(:,1)*.5/3600;
             pellet2grow=res.pell2grow;
             pellPerCm = pellet2grow*TW*2; %tunnwidth=2,another 2 for 1site=.5 cm
             pellsTot = sum(sum(res.markMatr(:,2:end)))/res.pause2dig/pellPerCm;
-%             ants(i)=nvars;
+            %             ants(i)=nvars;
             V(i)=pellsTot/(43200/(3600*2));
         end
         %sort runs
@@ -955,6 +967,53 @@ if(any(ismember(showFigs,xx)))
     end
 end
 
+%% 19 code for another file to make movie from road data
+xx=19;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    set(gcf,'position',[-177,735,1957,84])
+    load(fullfile(pwd,'gini.mat'));
+    [res,rf]=CA_FunctionsWill(giniY(8,:),length(giniY(8,:)),432,TW,...
+        0,0,600,.3,10);
+    rf2=rf+4;
+    colormap(lines)
+    c=colormap;
+    c(4,:)=[0,0,0];
+    c(5,:)=[1,1,1];
+    colormap(c);
+    for i=100:300
+        clf;
+        image(rf2(:,:,i))
+        pause(0.5);
+    end
+end
+%% 20 excavation rate vs. time
+xx=20;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    TW=2;
+%     set(gcf,'position',[-177,735,1957,84])
+    load('D:\Projects\Ant_CA_GA\results\longRuns 50 gens recharge .4 mut\1-100_n_ants\N=30_tw=2_2017-10-22-23-01.mat');
+    tt=432*4*100;
+    prob=bestofgen{end};
+    
+    res=CA_FunctionsWill(prob,length(prob),tt/100,TW,...
+        0,0,600,.3,10);
+    pellet2grow=res.pell2grow;
+%         pellPerCm = pellet2grow*2*2; %tunnwidth=2,another 2 for 1site=.5 cm
+    pellPerBL = pellet2grow*TW; %tunnwidth=2,took out extra 2 because we are plotting vs. BL
+    pellsTot = cumsum(sum(res.markMatr(:,2:end),2)/res.pause2dig/pellPerBL);
+    pellsTot = pellsTot(1:7200:end);
+    
+    simTime=[0:length(pellsTot)-1];
+    plot(simTime,pellsTot,'-o','markerfacecolor','w','linewidth',2)
+    xlabel('time (h)');
+    ylabel('BL');
+    figText(gcf,16); 
+    
+end
 %% 55 old gini vs generations
 xx=55;
 if(showFigs(showFigs==xx))
