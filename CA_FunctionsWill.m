@@ -361,7 +361,7 @@ for z=1:size(numantsALL,2)
             atFace(kk,systemState.globalindx(:))=systemState.atFace(:);
             flow(kk,:)= moved;
             occupied(kk,:)= [(abs(road(:,countSpot))==2)];
-            density(kk,:)= numel(find(road(:,countSpot)==2))/(tunneltip*tw);
+            density(kk,:)= numel(find(road(:,countSpot)~=1))/(tunneltip*tw);
             if tunneltip==1
                 break;
             end

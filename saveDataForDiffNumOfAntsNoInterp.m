@@ -1,4 +1,5 @@
-fold=uigetdir('D:\Projects\Ant_CA_GA\results');
+% fold=uigetdir('D:\Projects\Ant_CA_GA\results');
+fold=uigetdir('D:\Projects\Ant_CA_GA\results\longRuns 50 gens recharge .4 mut\1-100_n_ants');
 filez=dir(fullfile(fold,'*.mat'));
 NF=length(filez);
 clear s;
@@ -20,15 +21,16 @@ clear ress;
 %         % %         y=y./sum(y);
         %%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%GA unequal%%%%%%%%%
-        clear y;
-%         pp=InterpolateGAProbsFromProb(na(i),bestofgen{end});
+%         clear y;
+%         pp=InterpolateGAProbsFromProb(length(bestofgen{end}),bestofgen{end});
 %         pp=bestofgen{end};
         %%%%%%%%%%%%%%%%%%%%%%%
         
         %%%%%%%%%%%equal%%%%%%%%%%%%%
         pp=ones(1,nvars);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        ress{i}=CA_FunctionsWill(pp,length(pp),432,TW,energyMult,1,rechargeSteps,prob2turn,tuntip);
+%         ress{i}=CA_FunctionsWill(pp,length(pp),432,TW,energyMult,1,rechargeSteps,prob2turn,5);
+        ress{i}=CA_FunctionsWill(pp,length(pp),432,TW,energyMult,1,rechargeSteps,.6,5);
 %         ress{i}=CA_Functions2(y,length(y),432,2,1,1,300,p,10);  %probs,numants,numits*10000,width,infEnergy
 % %         %     yy=ress(i).atFace(end,:);
 % %         % pts('size=',i,' (G1,G2,G3)=(',G1,',',G2(l),',',G3(l),')');

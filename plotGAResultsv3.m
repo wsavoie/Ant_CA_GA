@@ -27,9 +27,10 @@ clear all
 %*17&18. V vs. N for 30 ant interpolated
 %*19. code for another file to make movie from road data
 %*20. excavation rate vs. time
+%*21. plot actual ant exp densities
 %*55. old gini vs generations
 %************************************************************
-showFigs=[2];
+showFigs=[21];
 % showFigs=[7 16];
 fold=uigetdir('D:\Projects\Ant_CA_GA\results');
 filez=dir(fullfile(fold,'*.mat'));
@@ -848,21 +849,21 @@ if(showFigs(showFigs==xx))
             %represents 2x trips (1 to tunnel tip, and 1 back with pellet) we
             %can get successful flow rate this way
             qq=sum(sum(res.markMatr(startTime:stopTime,2:end)))/res.pause2dig;
+            %%%%%%%%%%%%%
+            newq=qq/(ts/2); %each exc is 2 ant appearances: 2(ants/exc)*(exc/s)= (ants/s)     
+            qm(i) = newq/TW; %%ants/(lanes*sec)
             
-            %(successful excavations)/(system TS *1s/2ts)= exc/s
-            newq=qq/(ts/2);
-            %each exc is 2 ant appearances: 2(ants/exc)*(exc/s)= (ants/s)
-            newq=newq*2;
+            %%%%%%%%%%%%%%
             tunLen=reshape(tunLen(1:end),ts,size(tunLen(1:end),1)/ts);
             
-            newrho=reshape(singleLane(1:end),ts,size(singleLane(1:end),1)/ts)./tunLen;%ants/(bL*lanes)
+%             newrho=reshape(singleLane(1:end),ts,size(singleLane(1:end),1)/ts)./tunLen;%ants/(bL*lanes)
+            newrho=mean(singleLane./tunLen);
             
             
-            qm(i) = mean(newq)/2; %%ants/(lanes*sec)
-            tunLen=mean(tunLen);
-            d=0; %set zero for old way
+%             tunLen=mean(tunLen);
+            d=1; %set zero for old way
             if d
-                rhom(i) = mean(dens);
+                rhom(i) = mean(dens.*tunLen);
             else
                 rhom(i) = mean(newrho);
             end
@@ -873,8 +874,8 @@ if(showFigs(showFigs==xx))
         end
         
         %sort runs
-        [ants,inds]=sort(ants);
-        qm=qm(inds);%timestep is .5 s
+        [ants,inds]=sort(ants,'ascend');
+        qm=qm(inds);
         rhom=rhom(inds);
         %plot newly sorted
         
@@ -896,7 +897,7 @@ if(showFigs(showFigs==xx))
         
         %         set(gca,'XTick',[0.25 0.5],'YTick',[0 .1 .2],'XLim',[0.045 0.55],'YLim',[0,0.15]);
         %             set(gca,'XTick',[0.025 0.05 0.075],'YTick',[0.05 0.1 0.15],'yTicklabel',[], 'xTicklabel',[],'fontsize',fz);
-        set(gca,'XTick',[0.025 0.05 0.075],'YTick',[0.05 0.1 0.15],'fontsize',fz);
+%         set(gca,'XTick',[0.25 0.5 0.75],'YTick',[0.05 0.1 0.15],'fontsize',fz);
         
         %     set(cbarHandle,'fontsize',18');
         %     axis([0 .4 0 .075])
@@ -913,9 +914,27 @@ if(showFigs(showFigs==xx))
         xlab=xlabel('\rho (ants/(BL*lane)) ');
         %     ylab=ylabel('q (ants/(BL\cdotmin)');
         ylab=ylabel('q (ants/(s\cdotlane))');
-        ylim([0,.15]);
-        
+%         ylim([0,.15]);
+        xlim([0,.9])
+        ylim([0,.1])
+        set(gca,'ytick',[.02 .04 .06 .08 0.1])
     end
+    
+    a = 0.001:.001:.3; % alpha
+g = 1/25; % "switching rate" of excavation 
+v = .8; % Speed of ant (1 cell per frame)
+L = 5; % Length of tunnel
+S = .8; % Switching rate due to reversal
+p = 2*((L/2-.5*(1./a-v/g))./(.5*(1./a-v/S))+2)/v.*(1./(v*a)+2*L/v+1/S.*((L-.5.*(1./a-v/g))./(.5*(1./a-v/S))+1)+1/g).^-1;
+% p is rho, or density of tunnel
+
+q = (1./(v*a)+2*L/v+1/S.*((L-.5.*(1./a-v/g))./(.5*(1./a-v/S))+1)+1/g).^-1;
+% q is flow rate, in ants per frame
+
+conv = 0.5; % conversion, 0.5 seconds per frame.
+
+plot(p,2*q/conv,'linewidth',4);
+
 end
 %% *MAKES 17&18* V vs. N for 30 ant interpolated
 %Tunnel length excavated vs. time
@@ -1011,6 +1030,37 @@ if(showFigs(showFigs==xx))
     plot(simTime,pellsTot,'-o','markerfacecolor','w','linewidth',2)
     xlabel('time (h)');
     ylabel('BL');
+    figText(gcf,16); 
+    
+end
+%% 21. plot actual ant exp densities
+xx=21;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    
+    load('antno.mat');
+    antBL=6; %5mm/BL
+    antBW=2;
+    TLants=TL/antBL;% tunnel length/ant length gives TL in units of BL
+    Dexp1=mean(exp1120,2)'./TLants(1)/antBW;
+    Dexp2=mean(exp1123,2)'./TLants(2)/antBW;
+    Dexp3=mean(exp1130,2)'./TLants(3)/antBW;
+%     
+%     p1=plot([1,1,1],Dexp1(:),'o');
+%     p2=plot([2,2,2],Dexp2(:),'o');
+%     p3=plot([3,3,3],Dexp3(:),'o');
+%    errorbar(1,mean(Dexp1),std(Dexp1),'color',p1.Color,'marker','*')
+     
+    errorbar(1,mean(Dexp1),std(Dexp1),'marker','*')
+    errorbar(2,mean(Dexp2),std(Dexp2),'marker','*')
+    errorbar(3,mean(Dexp3),std(Dexp3),'marker','*')
+    
+    set(gca,'xtick',[1 2 3], 'xticklabels',{'EXP 1', 'EXP 2', 'EXP 3'})
+    
+    xlim([0,4])
+    xlabel('experiment');
+    ylabel('\rho (ants/(BL\cdotBW)');
     figText(gcf,16); 
     
 end
