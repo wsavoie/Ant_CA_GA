@@ -1038,30 +1038,62 @@ xx=21;
 if(showFigs(showFigs==xx))
     figure(xx)
     hold on;
-    
-    load('antno.mat');
-    antBL=6; %5mm/BL
-    antBW=2;
-    TLants=TL/antBL;% tunnel length/ant length gives TL in units of BL
-    Dexp1=mean(exp1120,2)'./TLants(1)/antBW;
-    Dexp2=mean(exp1123,2)'./TLants(2)/antBW;
-    Dexp3=mean(exp1130,2)'./TLants(3)/antBW;
+    xl=[0,4]; %xlim
+    yl=[0,1]; %ylim
+%%%%%%%%%%%%%%%old data%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+%     load('antno.mat');
+%     antBL=6; %6mm/BL
+%     antBW=2;
+%     TLants=TL/antBL;% tunnel length/ant length gives TL in units of BL
+%     e1=mean([exp1120(1,:),exp1120(2,:),exp1120(3,:)])./TLants(1)/antBW;
+%     e2=mean([exp1123(1,:),exp1123(2,:),exp1123(3,:)])./TLants(2)/antBW;
+%     e3=mean([exp1130(1,:),exp1130(2,:),exp1130(3,:)])./TLants(3)/antBW;
+%     plot([1 2 3],[e1 e2 e3],'-o');   
 %     
-%     p1=plot([1,1,1],Dexp1(:),'o');
-%     p2=plot([2,2,2],Dexp2(:),'o');
-%     p3=plot([3,3,3],Dexp3(:),'o');
-%    errorbar(1,mean(Dexp1),std(Dexp1),'color',p1.Color,'marker','*')
-     
-    errorbar(1,mean(Dexp1),std(Dexp1),'marker','*')
-    errorbar(2,mean(Dexp2),std(Dexp2),'marker','*')
-    errorbar(3,mean(Dexp3),std(Dexp3),'marker','*')
+%     meanDat=mean([e1,e2,e3]);
+%     plot(xl,[meanDat,meanDat],'r','linewidth',2);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    load('antnoNew.mat');
+    antBL=6; %6mm/1BL
+    antBW=2; %2BW/1 tunnel
+    
+    inds = [4:6];
+    TL1ants=antBW*TL(1,:)./(antBL); % (BW/tunnel)*mm/(mm/BL)=BW*BL/tunn
+    TL2ants=antBW*TL(2,:)./(antBL);
+    TL3ants=antBW*TL(3,:)./(antBL);
+    
+    e1=exp1120./TL1ants'; %(ants/tunnel)/(BL*BW/tunnel)= ants/(BL*BW)
+    e2=exp1123./TL2ants';
+    e3=exp1130./TL3ants';
+    
+    e1=e1(inds,:);
+    e2=e2(inds,:);
+    e3=e3(inds,:);
+    
+    e1m=mean(mean(e1,2));
+    e2m=mean(mean(e2,2));
+    e3m=mean(mean(e3,2));
+    
+    e1Err=std(mean(e1,2));
+    e2Err=std(mean(e2,2));
+    e3Err=std(mean(e3,2));
+    
+    errorbar([1 2 3],[e1m e2m e3m],[e1Err e2Err, e3Err]);
+    meanDat=mean([e1m,e2m,e3m]);
+    plot(xl,[meanDat,meanDat],'-','linewidth',2);
+
     
     set(gca,'xtick',[1 2 3], 'xticklabels',{'EXP 1', 'EXP 2', 'EXP 3'})
+%     set(gca,'ytick',[.2  .4 meanDat .6 .8 1], 'yticklabels',{'0.2','0.4',num2str(meanDat,2),'0.6','0.8','1' })
     
-    xlim([0,4])
+    xlim(xl);
+    ylim(yl);
     xlabel('experiment');
     ylabel('\rho (ants/(BL\cdotBW)');
-    figText(gcf,16); 
+    figText(gcf,16);
+    
     
 end
 %% 55 old gini vs generations
