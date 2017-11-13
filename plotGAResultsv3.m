@@ -30,7 +30,7 @@ clear all
 %*21. plot actual ant exp densities
 %*55. old gini vs generations
 %************************************************************
-showFigs=[21];
+showFigs=[15];
 % showFigs=[7 16];
 fold=uigetdir('D:\Projects\Ant_CA_GA\results');
 filez=dir(fullfile(fold,'*.mat'));
@@ -716,6 +716,8 @@ if(showFigs(showFigs==xx))
     fz= 20;
     clear xy
     TW=2;
+%     D:\Projects\Ant_CA_GA\results\longRuns 50 gens recharge .4 mut\finEng_24h\rand
+
     % load([pwd,'\R=600P=0.45\GAdat.mat']);
     %     load('D:\Projects\Ant_CA_GA\results\longRuns 50 gens recharge\long rand 50 gens\N=30_tw=2_2017-10-16-02-45.mat');
     load(fullfile(fold,filez(1).name));
@@ -761,8 +763,18 @@ if(showFigs(showFigs==xx))
     axis([0 1 0 1]);
     axis([0 1 0 1]);
     
+    
+    x2=[0,1]; y2=[1,0];
+    x2=interp1(x2,y2,gy(:,1));
+    y2=interp1(y2,y2,gy(:,1));
     plot(gy(:,1),gy(:,2),'Linewidth',3,'color',cc(9,:));
+    [xout,yout]=intersections(x2,y2,gy(:,1),gy(:,2),1);
+    text(0.32,0.32,[num2str(round(yout*100)),'%-',num2str(round(xout*100)),'%'])
     figText(gcf,fz);
+    plot([0,1],[1,0],'k','linewidth',2)
+    plot([0,xout],[yout,yout],'k--','linewidth',2)
+    plot([xout,xout],[0,yout],'k--','linewidth',2)
+    
 end
 
 %% 16. plot q_bar vs rho_bar old type different ant num from single prob
@@ -920,7 +932,7 @@ if(showFigs(showFigs==xx))
         set(gca,'ytick',[.02 .04 .06 .08 0.1])
     end
     
-    a = 0.001:.001:.3; % alpha
+a = 0.001:.001:.3; % alpha
 g = 1/25; % "switching rate" of excavation 
 v = .8; % Speed of ant (1 cell per frame)
 L = 5; % Length of tunnel
@@ -1059,7 +1071,20 @@ if(showFigs(showFigs==xx))
     antBL=6; %6mm/1BL
     antBW=2; %2BW/1 tunnel
     
-    inds = [4:6];
+    %inds=[1:3] short tunnel
+    %inds=[4:6] medium tunnel
+    %inds=[7:9] long tunnel
+    %middle tunnel lengths
+    tunLens=[1:3;4:6;7:9];
+    
+    tlb=TL/antBW;
+    expTL=reshape(tlb',[3,9])';
+    mexpBL=mean(expTL,2);
+    mexpBL=reshape(mexpBL,[3,3]);
+    
+    
+    for qq=1:size(tunLens,1)
+    inds=tunLens(qq,:);
     TL1ants=antBW*TL(1,:)./(antBL); % (BW/tunnel)*mm/(mm/BL)=BW*BL/tunn
     TL2ants=antBW*TL(2,:)./(antBL);
     TL3ants=antBW*TL(3,:)./(antBL);
@@ -1067,7 +1092,7 @@ if(showFigs(showFigs==xx))
     e1=exp1120./TL1ants'; %(ants/tunnel)/(BL*BW/tunnel)= ants/(BL*BW)
     e2=exp1123./TL2ants';
     e3=exp1130./TL3ants';
-    
+
     e1=e1(inds,:);
     e2=e2(inds,:);
     e3=e3(inds,:);
@@ -1080,10 +1105,12 @@ if(showFigs(showFigs==xx))
     e2Err=std(mean(e2,2));
     e3Err=std(mean(e3,2));
     
-    errorbar([1 2 3],[e1m e2m e3m],[e1Err e2Err, e3Err]);
+    h=errorbar([1 2 3],[e1m e2m e3m],[e1Err e2Err, e3Err],'linewidth',1.5);
+    set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
     meanDat=mean([e1m,e2m,e3m]);
-    plot(xl,[meanDat,meanDat],'-','linewidth',2);
-
+    
+    plot([0,0.5],[meanDat,meanDat],'-','linewidth',2,'color',h.Color);
+    end
     
     set(gca,'xtick',[1 2 3], 'xticklabels',{'EXP 1', 'EXP 2', 'EXP 3'})
 %     set(gca,'ytick',[.2  .4 meanDat .6 .8 1], 'yticklabels',{'0.2','0.4',num2str(meanDat,2),'0.6','0.8','1' })
