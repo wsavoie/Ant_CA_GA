@@ -30,7 +30,7 @@ clear all
 %*21. plot actual ant exp densities
 %*55. old gini vs generations
 %************************************************************
-showFigs=[15];
+showFigs=[11];
 % showFigs=[7 16];
 fold=uigetdir('D:\Projects\Ant_CA_GA\results');
 filez=dir(fullfile(fold,'*.mat'));
@@ -557,14 +557,15 @@ if(showFigs(showFigs==xx))
     load(fullfile(pwd,'gini.mat'));
     Gout=zeros(length(giniX),numIts);
     for i=1:length(giniX)
-        for j=1:numIts
-            res=CA_FunctionsWill(giniY(i,:),length(giniY(i,:)),432,TW,...
+        parfor j=1:numIts
+            res=CA_FunctionsWill(giniY(i,:),length(giniY(i,:)),432*4,TW,...
                 1,1,10,.3,10);
 
             pellet2grow=res.pell2grow;
             pellPerCm = pellet2grow*2*2; %tunnwidth=2,another 2 for 1site=.5 cm
             pellsTot = sum(sum(res.markMatr(:,2:end)))/res.pause2dig/pellPerCm;
             Gout(i,j)=Gini(sum(res.markMatr(:,2:end)));
+%             Gout(i,j)=Gini(sum(res.markMatr(:,2:end))/res.pause2dig/pellPerCm)
         end
         pts(i,'/',length(giniX));
     end
