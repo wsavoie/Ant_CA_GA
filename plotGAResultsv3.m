@@ -30,7 +30,7 @@ clear all
 %*21. plot actual ant exp densities
 %*55. old gini vs generations
 %************************************************************
-showFigs=[11];
+showFigs=[21];
 % showFigs=[7 16];
 fold=uigetdir('D:\Projects\Ant_CA_GA\results');
 filez=dir(fullfile(fold,'*.mat'));
@@ -1052,7 +1052,7 @@ if(showFigs(showFigs==xx))
     figure(xx)
     hold on;
     xl=[0,4]; %xlim
-    yl=[0,1]; %ylim
+    yl=[0,2]; %ylim
 %%%%%%%%%%%%%%%old data%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 %     load('antno.mat');
@@ -1068,8 +1068,9 @@ if(showFigs(showFigs==xx))
 %     plot(xl,[meanDat,meanDat],'r','linewidth',2);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    load('antnoNew.mat');
-    antBL=6; %6mm/1BL
+    load('antnoNew2.mat');
+%     antBL=6; %6mm/1BL
+    antBL=1; %6mm/1BL
     antBW=2; %2BW/1 tunnel
     
     %inds=[1:3] short tunnel
@@ -1086,11 +1087,16 @@ if(showFigs(showFigs==xx))
     
     for qq=1:size(tunLens,1)
     inds=tunLens(qq,:);
-    TL1ants=antBW*TL(1,:)./(antBL); % (BW/tunnel)*mm/(mm/BL)=BW*BL/tunn
-    TL2ants=antBW*TL(2,:)./(antBL);
-    TL3ants=antBW*TL(3,:)./(antBL);
+%     TL1ants=antBW*TL(1,:)./(antBL); % (BW/tunnel)*mm/(mm/BL)=BW*BL/tunn
+%     TL2ants=antBW*TL(2,:)./(antBL);
+%     TL3ants=antBW*TL(3,:)./(antBL);
     
-    e1=exp1120./TL1ants'; %(ants/tunnel)/(BL*BW/tunnel)= ants/(BL*BW)
+    TL1ants=antBW; % (BW/tunnel)=BW/tunn
+    TL2ants=antBW;
+    TL3ants=antBW;
+    
+    %%%%%old  units from commented code%(ants/tunnel)/(BL*BW/tunnel)= ants/(BL*BW)
+    e1=exp1120./TL1ants'; %(ants/tunnel)/(bw/tunnel)= ants/(BW)
     e2=exp1123./TL2ants';
     e3=exp1130./TL3ants';
 
@@ -1108,9 +1114,9 @@ if(showFigs(showFigs==xx))
     
     h=errorbar([1 2 3],[e1m e2m e3m],[e1Err e2Err, e3Err],'linewidth',1.5);
     set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-    meanDat=mean([e1m,e2m,e3m]);
+    meanDat(qq)=mean([e1m,e2m,e3m]);
     
-    plot([0,0.5],[meanDat,meanDat],'-','linewidth',2,'color',h.Color);
+    plot([0,0.5],[meanDat(qq),meanDat(qq)],'-','linewidth',2,'color',h.Color);
     end
     
     set(gca,'xtick',[1 2 3], 'xticklabels',{'EXP 1', 'EXP 2', 'EXP 3'})
