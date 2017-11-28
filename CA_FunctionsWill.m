@@ -125,6 +125,7 @@ for z=1:size(numantsALL,2)
         systemState.time2drop=zeros(numants,1);              %8 - # of steps ant spent droping the pellet
         systemState.prob=zeros(numants,1);
         systemState.atFace=zeros(numants,1);
+
         resting=zeros(numants,1);
         %         systemState.atFace=zeros(numants,1);
         %         systemState.prob = prob;
@@ -177,6 +178,7 @@ for z=1:size(numantsALL,2)
         flow = zeros(iterations,tw);
         occupied = zeros(iterations,tw);
         density = zeros(iterations,1);
+        entsRevs=zeros(iterations,3);
         %         groupEnergy=zeros(
         
         indEnergy= zeros(iterations,numants,length(runIts)); % energy of individual ants per 1 step of cycle
@@ -185,7 +187,7 @@ for z=1:size(numantsALL,2)
 %         markMatrN0=zeros(iterations,numants+1,length(runIts));
         %%%%%%%%%%%%%%
         for kk=1:iterations
-            
+            entsRevs(kk,1)=kk;
             ind = randperm(numants);
             systemState.x(:)= systemState.x(ind);
             systemState.y(:)= systemState.y(ind);
@@ -228,6 +230,8 @@ for z=1:size(numantsALL,2)
                                     road(y(jj), x(jj))=-2;
                                     systemState.restflag(jj,1)=0;
                                     systemState.pellet(jj,1)=0;
+                                    entsRevs(kk,2)=entsRevs(kk,2)+1;
+                                    
                                 else
                                     systemState.time2drop(jj,1)=systemState.time2drop(jj,1)-1;
                                 end
@@ -243,6 +247,7 @@ for z=1:size(numantsALL,2)
                                 if road(y(jj), x(jj))==1
                                     road(y(jj), x(jj))=-2;
                                     systemState.restflag(jj,1)=0;
+                                    entsRevs(kk,2)=entsRevs(kk,2)+1;
                                 end
                             end
                         else
@@ -278,7 +283,10 @@ for z=1:size(numantsALL,2)
                 
                 if systemState.restflag(jj)~=1 && systemState.digpause(jj)==0
 %                     [road, systemState, growth_energy, vdir,uselessRuns,moved] = Walking(systemState, jj, prob_lateral, prob_forward, prob_lateralp, prob_forwardp, walk_ECost,growth_energy,m, Transp_ECost, road, x, y, roadlength, tunneltip, elow_limit, prob_turn,tunnelsize,uselessRuns,countSpot,moved);
-                [road, systemState, growth_energy, ~,uselessRuns,moved] = Walking(systemState, jj, prob_lateral, prob_forward, prob_lateralp, prob_forwardp, walk_ECost,growth_energy,m, Transp_ECost, road, x, y, roadlength, tunneltip, elow_limit, prob_turn,tunnelsize,uselessRuns,countSpot,moved);
+                [road, systemState, growth_energy, rev,uselessRuns,moved] = Walking(systemState, jj, prob_lateral, prob_forward, prob_lateralp, prob_forwardp, walk_ECost,growth_energy,m, Transp_ECost, road, x, y, roadlength, tunneltip, elow_limit, prob_turn,tunnelsize,uselessRuns,countSpot,moved);
+                    if(rev==1)
+                        entsRevs(kk,3)=entsRevs(kk,3)+1;
+                    end
                 end
                 %order digging / set to digging/ walking is important
                 if(x(jj) == (roadlength-tunneltip))
@@ -418,6 +426,7 @@ for z=1:size(numantsALL,2)
     ResEnergy(z).infEnergy = energyMult>1;
     ResEnergy(z).equalDis     = all(probs(1,1)==probs(1,:));
     ResEnergy(z).density = density;
+    ResEnergy(z).entsRev=entsRevs;
     %energyMult = 1 if non-inf energy!
     clearvars groupEnergy indEnergy tunLength markMatr markMatrN0
 end

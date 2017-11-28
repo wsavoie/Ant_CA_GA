@@ -30,7 +30,7 @@ clear all
 %*21. plot actual ant exp densities
 %*55. old gini vs generations
 %************************************************************
-showFigs=[21];
+showFigs=[22];
 % showFigs=[7 16];
 fold=uigetdir('D:\Projects\Ant_CA_GA\results');
 filez=dir(fullfile(fold,'*.mat'));
@@ -1130,6 +1130,51 @@ if(showFigs(showFigs==xx))
     
     
 end
+
+%% 22 reversals vs entrances
+xx=22;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    fz= 20;
+    cc=get(gca,'colororder');
+    
+    unitless=0;
+    TW=2;
+    datAll=zeros(NF,4);     %type,ant#,revProb,ExcavationAmount
+    
+                load(['D:\Projects\Ant_CA_GA\results\longRuns 50 gens recharge .4 mut\1-100_n_ants\N=30_tw=2_2017-10-22-23-01.mat']);
+%                 pp=InterpolateGAProbsFromProb(ants(i),bestofgen{end});
+    res=CA_FunctionsWill(bestofgenOUT{end},length(bestofgenOUT{end}),432,TW,...
+            energyMult,1,rechargeSteps,.1,tuntip); %tuntip instead of 5
+    a=res.entsRev;
+    er=cumsum(a(:,[2,3]));
+    plot(er(1:800,1),er(1:800,2),'o','markerfacecolor','k')
+    
+%     for i=1:NF
+%         load(fullfile(fold,filez(i).name));
+%         [~,val]=parseFileNames(filez(i).name,1);
+%         xt=res.tunLength(:,1)*.5/3600;
+%         pellet2grow=res.pell2grow;
+% %         pellPerCm = pellet2grow*2*2; %tunnwidth=2,another 2 for 1site=.5 cm
+% %         pellsTot = sum(sum(res.markMatr(:,2:end)))/res.pause2dig/pellPerCm;
+%         pellPerBL = pellet2grow*TW; %tunnwidth=2,another 2 for 1site=.5 cm
+%         pellsTot = sum(sum(res.markMatr(:,2:end)))/res.pause2dig/pellPerBL;
+%         
+%         datAll(i,:)=[val(1),res.numants,val(2),pellsTot];
+%     end
+%     eq=datAll(datAll(:,1)==0,:); %equal distrib= type 0, square marker
+%     uneq=datAll(datAll(:,1)==1,:);%unequal distrib= type 1 circle marker
+%       load('D:\Projects\Ant_CA_GA\results\longRuns 50 gens recharge .4 mut\finEng_24h\revCount432x4\type_0_R_0.3.mat');
+%       plot(res.tunEnt,res.tunRev,'o');
+    
+    
+    
+    xlabel('Entrances');
+    ylabel('Reversals');
+%     figText(gcf,fz,2);
+end
+
 %% 55 old gini vs generations
 xx=55;
 if(showFigs(showFigs==xx))

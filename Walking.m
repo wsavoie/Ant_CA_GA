@@ -1,7 +1,8 @@
-function [road, systemState, growth_energy, vdir,uselessRuns,moved] = Walking(systemState, jj, prob_lateral, prob_forward, prob_lateralp, prob_forwardp, walk_ECost,growth_energy,m, Transp_ECost, road, x, y, roadlength, tunneltip, elow_limit, prob_turn,tunnelsize,uselessRuns,countSpot,moved)
+function [road, systemState, growth_energy, rev,uselessRuns,moved] = Walking(systemState, jj, prob_lateral, prob_forward, prob_lateralp, prob_forwardp, walk_ECost,growth_energy,m, Transp_ECost, road, x, y, roadlength, tunneltip, elow_limit, prob_turn,tunnelsize,uselessRuns,countSpot,moved)
 %WALKING Summary of this function goes here
 xorig= x(jj);
 yorig= y(jj);
+rev=0;
 %decide if ant carries a pellet or not
 
 if  systemState.pellet(jj,1)==0
@@ -74,6 +75,9 @@ if abs(road(yahead, xahead)) == 2 && xahead>=roadlength-tunneltip && vdir<0 && x
     %disp('here')
     if rand(1)<prob_turn
         road(y(jj), x(jj)) = -road(y(jj), x(jj)); % random turn when jammed
+        rev=1;
+    else
+        rev=0;
     end
 end
 
@@ -101,25 +105,3 @@ if(xorig==countSpot)
         moved(yorig)=0;
     end
 end
-                    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

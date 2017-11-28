@@ -14,7 +14,7 @@ for(tt=[0 1])
         %     energyMult,1,rechargeSteps,prob2turn,tuntip);
         % filez=uigetfile('D:\Projects\Ant_CA_GA\results');
         % filez='D:\Projects\Ant_CA_GA\results\unequal seed 5-100 tw=2 gen=20\N=30_tw=2_2017-08-17-00-03.mat';
-        filez='D:\Projects\Ant_CA_GA\results\longRuns 50 gens recharge .4 mut\finEng_12h\rand\N=30_tw=2_2017-10-22-23-01.mat';
+        filez='D:\Projects\Ant_CA_GA\results\longRuns 50 gens recharge .4 mut\finEng_24h\rand\N=30_tw=2_2017-10-22-23-01.mat';
         load(filez);
         % prob2turn = .06;
         numIts=432*4;
@@ -35,7 +35,7 @@ for(tt=[0 1])
         a=datestr(now,dateFormat);
         roadSmall=roadFull(:,:,1000:1100);
         % fnameOut=fullfile(pwd,[a,'roadData.mat']);
-        fnameOut=fullfile('D:\Projects\Ant_CA_GA\results\longRuns 50 gens recharge .4 mut\finEng_12h\reversal data 432x4 its',['type_',num2str(typez),'_R_',num2str(prob2turn),'.mat']);
+        fnameOut=fullfile('D:\Projects\Ant_CA_GA\results\longRuns 50 gens recharge .4 mut\finEng_24h\revCount432x4',['type_',num2str(typez),'_R_',num2str(prob2turn),'.mat']);
         save(fnameOut,'roadFull','roadSmall','res');
         pts(count,'/',47*2);
     end
